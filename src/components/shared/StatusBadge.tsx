@@ -1,0 +1,92 @@
+import {
+  ArrowRightLeft,
+  CalendarOff,
+  CircleAlert,
+  CircleCheck,
+  CircleMinus,
+  Clock,
+  GraduationCap,
+  CircleX,
+  type LucideIcon,
+} from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import type { AttendanceStatus, FeeStatus, StudentStatus } from "@/types";
+
+const TONE = {
+  navy: "border-transparent bg-deep-navy text-white",
+  gold: "border-transparent bg-marigold text-deep-navy",
+  cloud: "border-deep-navy/25 bg-cloud text-deep-navy",
+  leaf: "border-transparent bg-leaf text-white",
+} as const;
+
+function StatusChip({
+  icon: Icon,
+  label,
+  tone,
+  className,
+}: {
+  icon: LucideIcon;
+  label: string;
+  tone: keyof typeof TONE;
+  className?: string;
+}) {
+  return (
+    <Badge
+      variant="secondary"
+      className={cn("h-6 gap-1 rounded-full px-2 text-xs font-semibold", TONE[tone], className)}
+    >
+      <Icon className="size-3.5" strokeWidth={2.25} aria-hidden />
+      <span>{label}</span>
+    </Badge>
+  );
+}
+
+const FEE_STATUS: Record<FeeStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  PAID: { icon: CircleCheck, label: "Paid", tone: "navy" },
+  PENDING: { icon: CircleAlert, label: "Pending", tone: "gold" },
+  PARTIAL: { icon: Clock, label: "Partial", tone: "cloud" },
+};
+
+const STUDENT_STATUS: Record<StudentStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  ACTIVE: { icon: CircleCheck, label: "Active", tone: "navy" },
+  INACTIVE: { icon: CircleMinus, label: "Inactive", tone: "cloud" },
+  GRADUATED: { icon: GraduationCap, label: "Graduated", tone: "leaf" },
+  TRANSFERRED: { icon: ArrowRightLeft, label: "Transferred", tone: "gold" },
+};
+
+export function FeeStatusBadge({ status }: { status: FeeStatus }) {
+  const item = FEE_STATUS[status];
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+export function StudentStatusBadge({ status }: { status: StudentStatus }) {
+  const item = STUDENT_STATUS[status];
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+export const ATTENDANCE_OPTIONS: Record<
+  AttendanceStatus,
+  { icon: LucideIcon; label: string; activeClass: string }
+> = {
+  PRESENT: {
+    icon: CircleCheck,
+    label: "Present",
+    activeClass: "border-deep-navy bg-deep-navy text-white",
+  },
+  ABSENT: {
+    icon: CircleX,
+    label: "Absent",
+    activeClass: "border-deep-navy bg-white text-deep-navy ring-1 ring-deep-navy",
+  },
+  LATE: {
+    icon: Clock,
+    label: "Late",
+    activeClass: "border-marigold bg-marigold text-deep-navy",
+  },
+  LEAVE: {
+    icon: CalendarOff,
+    label: "Leave",
+    activeClass: "border-deep-navy/30 bg-cloud text-deep-navy",
+  },
+};
