@@ -24,8 +24,13 @@ import type {
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
+function resolveApiBaseUrl() {
+  const raw = (process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1").trim().replace(/\/+$/, "");
+  return raw.endsWith("/api/v1") ? raw : `${raw}/api/v1`;
+}
+
 export const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8080/api/v1",
+  baseURL: resolveApiBaseUrl(),
   timeout: 15000,
   headers: { "Content-Type": "application/json" },
 });
