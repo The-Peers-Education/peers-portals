@@ -2,6 +2,7 @@ import {
   Banknote,
   CalendarCheck,
   LayoutGrid,
+  UserCog,
   Users,
   Wallet,
   type LucideIcon,
@@ -28,6 +29,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Students",
     icon: Users,
     roles: ROUTE_ROLES["/students"],
+  },
+  {
+    href: "/staff",
+    label: "Staff",
+    icon: UserCog,
+    roles: ROUTE_ROLES["/staff"],
   },
   {
     href: "/attendance",

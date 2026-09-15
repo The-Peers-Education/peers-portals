@@ -5,6 +5,7 @@ import { AUTH_COOKIE } from "@/lib/cookies";
 const PROTECTED_PREFIXES = [
   "/dashboard",
   "/students",
+  "/staff",
   "/attendance",
   "/fees",
   "/expenses",

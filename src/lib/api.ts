@@ -10,10 +10,16 @@ import type {
   CreateStudentInput,
   Expense,
   FeeChallan,
+  FeeReport,
   FeeStatus,
   LoginPayload,
+  RecordFeePaymentInput,
+  RegisterStaffInput,
   Student,
+  StudentProfile,
   StudentStatus,
+  UpdateStaffInput,
+  UpdateStudentInput,
   User,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
@@ -68,6 +74,8 @@ export const authApi = {
   login: (payload: LoginPayload) =>
     api.post<ApiResponse<AuthPayload>>("/auth/login", payload).then(unwrap),
   me: () => api.get<ApiResponse<User>>("/auth/me").then(unwrap),
+  register: (payload: RegisterStaffInput) =>
+    api.post<ApiResponse<AuthPayload>>("/auth/register", payload).then(unwrap),
 };
 
 export const branchesApi = {
@@ -78,8 +86,18 @@ export const branchesApi = {
 export const studentsApi = {
   list: (params?: { classSection?: string; status?: StudentStatus }) =>
     api.get<ApiResponse<Student[]>>("/students", { params }).then(unwrap),
+  getById: (id: string) => api.get<ApiResponse<StudentProfile>>(`/students/${id}`).then(unwrap),
   create: (payload: CreateStudentInput) =>
     api.post<ApiResponse<Student>>("/students", payload).then(unwrap),
+  update: (id: string, payload: UpdateStudentInput) =>
+    api.patch<ApiResponse<Student>>(`/students/${id}`, payload).then(unwrap),
+  remove: (id: string) => api.delete<ApiResponse<Student>>(`/students/${id}`).then(unwrap),
+};
+
+export const staffApi = {
+  list: () => api.get<ApiResponse<User[]>>("/staff").then(unwrap),
+  update: (id: string, payload: UpdateStaffInput) =>
+    api.patch<ApiResponse<User>>(`/staff/${id}/role`, payload).then(unwrap),
 };
 
 export const feesApi = {
@@ -95,6 +113,10 @@ export const feesApi = {
     api
       .patch<ApiResponse<FeeChallan>>(`/fees/challans/${id}/status`, { status })
       .then(unwrap),
+  recordPayment: (id: string, payload: RecordFeePaymentInput) =>
+    api.post<ApiResponse<FeeChallan>>(`/fees/challans/${id}/payments`, payload).then(unwrap),
+  reports: (params?: { month?: number; year?: number }) =>
+    api.get<ApiResponse<FeeReport>>("/fees/reports", { params }).then(unwrap),
 };
 
 export const attendanceApi = {

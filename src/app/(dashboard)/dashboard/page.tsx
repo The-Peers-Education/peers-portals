@@ -21,7 +21,7 @@ import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animation
 import { expensesApi, feesApi, studentsApi } from "@/lib/api";
 import { canManageFees, canMarkAttendance } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
-import { formatPkr, toAmount, cn } from "@/lib/utils";
+import { formatPkr, remainingBalance, toAmount, cn } from "@/lib/utils";
 
 export default function DashboardPage() {
   const user = useAuthStore((state) => state.user);
@@ -53,11 +53,11 @@ export default function DashboardPage() {
     const expenses = expensesQuery.data ?? [];
 
     const collectedThisMonth = challans
-      .filter((item) => item.status === "PAID" && item.month === month && item.year === year)
-      .reduce((sum, item) => sum + toAmount(item.amount), 0);
+      .filter((item) => item.month === month && item.year === year)
+      .reduce((sum, item) => sum + toAmount(item.paidAmount ?? (item.status === "PAID" ? item.amount : 0)), 0);
     const pendingFees = challans
       .filter((item) => item.status === "PENDING" || item.status === "PARTIAL")
-      .reduce((sum, item) => sum + toAmount(item.amount), 0);
+      .reduce((sum, item) => sum + remainingBalance(item), 0);
     const totalExpenses = expenses.reduce((sum, item) => sum + toAmount(item.amount), 0);
 
     return {

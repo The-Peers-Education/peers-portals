@@ -69,6 +69,15 @@ export function formatMonthYear(month: number, year: number) {
   return `${MONTHS[month - 1] ?? month} ${year}`;
 }
 
+export function remainingBalance(challan: {
+  amount: string | number;
+  paidAmount?: string | number;
+  remainingBalance?: number;
+}) {
+  if (challan.remainingBalance !== undefined) return toAmount(challan.remainingBalance);
+  return Math.max(0, toAmount(challan.amount) - toAmount(challan.paidAmount));
+}
+
 export const EXPENSE_CATEGORIES = [
   "Salaries",
   "Rent",

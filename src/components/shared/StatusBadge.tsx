@@ -53,6 +53,7 @@ const STUDENT_STATUS: Record<StudentStatus, { icon: LucideIcon; label: string; t
   INACTIVE: { icon: CircleMinus, label: "Inactive", tone: "cloud" },
   GRADUATED: { icon: GraduationCap, label: "Graduated", tone: "leaf" },
   TRANSFERRED: { icon: ArrowRightLeft, label: "Transferred", tone: "gold" },
+  WITHDRAWN: { icon: CircleMinus, label: "Withdrawn", tone: "cloud" },
 };
 
 export function FeeStatusBadge({ status }: { status: FeeStatus }) {

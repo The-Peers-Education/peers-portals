@@ -11,6 +11,7 @@ import { FadeIn } from "@/components/ui/animations";
 import { Field } from "@/components/shared/Field";
 import { PasswordInput } from "@/components/shared/PasswordInput";
 import { authApi } from "@/lib/api";
+import { isStaffRole } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -34,6 +35,10 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const result = await authApi.login({ email, password });
+      if (!isStaffRole(result.user.role)) {
+        toast.error("Parent accounts must use the dedicated Parent Portal.");
+        return;
+      }
       setSession(result.token, result.user);
       try {
         const profile = await authApi.me();

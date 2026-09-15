@@ -9,7 +9,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { SkipLink } from "@/components/shared/SkipLink";
 import { PageTransition } from "@/components/ui/animations";
 import { authApi, branchesApi } from "@/lib/api";
-import { canAccessRoute } from "@/lib/rbac";
+import { canAccessRoute, isStaffRole } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 
@@ -27,6 +27,7 @@ export default function DashboardLayout({
   const activeBranchId = useAuthStore((state) => state.activeBranchId);
   const setUser = useAuthStore((state) => state.setUser);
   const setActiveBranchId = useAuthStore((state) => state.setActiveBranchId);
+  const clearAuth = useAuthStore((state) => state.clearAuth);
 
   const { data: profile } = useQuery({
     queryKey: ["me"],
@@ -56,10 +57,15 @@ export default function DashboardLayout({
       router.replace("/login");
       return;
     }
+    if (user && !isStaffRole(user.role)) {
+      clearAuth();
+      router.replace("/login");
+      return;
+    }
     if (user && !canAccessRoute(pathname, user.role)) {
       router.replace("/dashboard");
     }
-  }, [hasHydrated, token, user, pathname, router]);
+  }, [hasHydrated, token, user, pathname, router, clearAuth]);
 
   if (!hasHydrated || !token || !user) {
     return <LoadingSpinner fullPage label="Preparing portal" />;

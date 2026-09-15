@@ -169,3 +169,20 @@
     cursor: not-allowed;
   }
 }
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  #printable-challan,
+  #printable-challan * {
+    visibility: visible !important;
+  }
+  #printable-challan {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    background: white !important;
+    box-shadow: none !important;
+  }
+}
