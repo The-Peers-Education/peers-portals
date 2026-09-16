@@ -97,8 +97,8 @@ export default function DashboardLayout({
             menuOpen={sidebarOpen}
             onMenuClick={() => setSidebarOpen((current) => !current)}
           />
-          <main id="main-content" tabIndex={-1} className="flex-1 scroll-mt-4 p-4 outline-none md:p-8">
-            <div className="mx-auto w-full max-w-screen-2xl">
+          <main id="main-content" tabIndex={-1} className="min-w-0 flex-1 scroll-mt-4 outline-none">
+            <div className="mx-auto w-full max-w-screen-2xl p-3 sm:p-4 md:p-8">
               <PageTransition routeKey={pathname}>{children}</PageTransition>
             </div>
           </main>

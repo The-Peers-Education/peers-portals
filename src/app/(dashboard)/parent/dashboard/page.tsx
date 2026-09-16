@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { StatCard } from "@/components/shared/StatCard";
-import { StatCardSkeleton, TableSkeleton } from "@/components/shared/Skeleton";
+import { ParentDashboardSkeleton, Skeleton, StatCardSkeleton } from "@/components/shared/Skeleton";
 import { FeeStatusBadge, HomeworkStatusBadge, ATTENDANCE_OPTIONS } from "@/components/shared/StatusBadge";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
 import { parentApi, homeworkApi } from "@/lib/api";
@@ -87,11 +87,7 @@ export default function ParentDashboardPage() {
     return (
       <PageShell>
         <PageHeader title="My children" description="Attendance, fees, and homework for your family." />
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StatCardSkeleton key={index} />
-          ))}
-        </div>
+        <ParentDashboardSkeleton />
       </PageShell>
     );
   }
@@ -227,7 +223,10 @@ export default function ParentDashboardPage() {
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {summaryQuery.isLoading ? (
-              <TableSkeleton rows={3} />
+              <div className="flex flex-col gap-3">
+                <Skeleton className="h-14 rounded-[10px]" />
+                <Skeleton className="h-14 rounded-[10px]" />
+              </div>
             ) : unpaidFees.length === 0 ? (
               <p className="text-sm text-muted-foreground">No unpaid challans for this child.</p>
             ) : (

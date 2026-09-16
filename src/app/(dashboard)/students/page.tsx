@@ -462,7 +462,7 @@ export default function StudentsPage() {
         }
       >
         {profileQuery.isLoading || !profile ? (
-          <p className="text-sm text-muted-foreground">Loading profile…</p>
+          <TableSkeleton rows={4} cols={2} paged={false} />
         ) : (
           <div className="flex flex-col gap-6">
             {canEdit ? (

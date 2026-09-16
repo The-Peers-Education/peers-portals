@@ -27,7 +27,7 @@ import { ChallanReceipt } from "@/components/fees/ChallanReceipt";
 import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { StatCardSkeleton, TableSkeleton } from "@/components/shared/Skeleton";
 import { StatCard } from "@/components/shared/StatCard";
 import { FeeStatusBadge } from "@/components/shared/StatusBadge";
 import { feesApi, studentsApi, branchesApi } from "@/lib/api";
@@ -261,28 +261,34 @@ export default function FeesPage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-3">
-        <StatCard
-          title="Collected"
-          value={formatPkr(report?.totalCollected ?? 0)}
-          hint="Total paid across challans"
-          icon={Banknote}
-        />
-        <StatCard
-          title="Outstanding"
-          value={formatPkr(report?.totalPending ?? report?.outstandingBalance ?? 0)}
-          hint="Pending and partial balances"
-          icon={Receipt}
-        />
-        <StatCard
-          title="Invoiced"
-          value={formatPkr(report?.invoicedAmount ?? 0)}
-          hint={`${report?.counts.paid ?? 0} paid · ${report?.counts.partial ?? 0} partial · ${report?.counts.pending ?? 0} pending`}
-          icon={Building2}
-        />
+        {reportQuery.isLoading ? (
+          Array.from({ length: 3 }).map((_, index) => <StatCardSkeleton key={index} />)
+        ) : (
+          <>
+            <StatCard
+              title="Collected"
+              value={formatPkr(report?.totalCollected ?? 0)}
+              hint="Total paid across challans"
+              icon={Banknote}
+            />
+            <StatCard
+              title="Outstanding"
+              value={formatPkr(report?.totalPending ?? report?.outstandingBalance ?? 0)}
+              hint="Pending and partial balances"
+              icon={Receipt}
+            />
+            <StatCard
+              title="Invoiced"
+              value={formatPkr(report?.invoicedAmount ?? 0)}
+              hint={`${report?.counts.paid ?? 0} paid · ${report?.counts.partial ?? 0} partial · ${report?.counts.pending ?? 0} pending`}
+              icon={Building2}
+            />
+          </>
+        )}
       </div>
 
       <Tabs value={status} onValueChange={(value) => setStatus(value as typeof status)}>
-        <TabsList className="bg-cloud/60">
+        <TabsList className="max-w-full overflow-x-auto bg-cloud/60">
           <TabsTrigger value="ALL">All</TabsTrigger>
           <TabsTrigger value="PENDING">Pending</TabsTrigger>
           <TabsTrigger value="PARTIAL">Partial</TabsTrigger>

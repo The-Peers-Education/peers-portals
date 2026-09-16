@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { KanbanSkeleton } from "@/components/shared/Skeleton";
 import { AdmissionsStatusBadge } from "@/components/shared/StatusBadge";
 import { admissionsApi } from "@/lib/api";
 import { canManageAdmissions } from "@/lib/rbac";
@@ -87,7 +87,7 @@ export default function AdmissionsPage() {
       />
 
       {leadsQuery.isLoading ? (
-        <TableSkeleton rows={6} />
+        <KanbanSkeleton />
       ) : (leadsQuery.data ?? []).length === 0 ? (
         <EmptyHint
           icon={ClipboardList}
@@ -100,7 +100,7 @@ export default function AdmissionsPage() {
           {COLUMNS.map((column) => (
             <section
               key={column.status}
-              className="flex min-h-48 w-[22rem] min-w-[22rem] flex-1 flex-col gap-3 rounded-[12px] bg-cloud p-3"
+              className="flex min-h-48 w-[min(20rem,calc(100vw-2.5rem))] shrink-0 flex-col gap-3 rounded-[12px] bg-cloud p-3"
             >
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-[15px] font-medium text-deep-navy">{column.title}</h2>

@@ -28,7 +28,7 @@ import {
 import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { ClassListSkeleton, TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi, staffApi, studentsApi } from "@/lib/api";
 import { canManageAcademics } from "@/lib/rbac";
 import { portalPath } from "@/lib/paths";
@@ -119,7 +119,7 @@ export default function AcademicClassesPage() {
       <AcademicsNav />
 
       {classesQuery.isLoading ? (
-        <TableSkeleton rows={4} cols={3} />
+        <ClassListSkeleton />
       ) : (classesQuery.data ?? []).length === 0 ? (
         <EmptyHint
           icon={GraduationCap}
@@ -314,7 +314,7 @@ function ClassCard({
       {canEdit ? (
         <div className="mt-4 grid gap-3 md:grid-cols-2">
           <form
-            className="grid grid-cols-[1fr_5rem_5rem_auto] gap-2"
+            className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_5rem_5rem_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               if (sectionName) sectionMutation.mutate();
@@ -351,7 +351,7 @@ function ClassCard({
             </Button>
           </form>
           <form
-            className="grid grid-cols-[1fr_1fr_auto] gap-2"
+            className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_1fr_auto]"
             onSubmit={(event) => {
               event.preventDefault();
               if (subject.name && subject.code) subjectMutation.mutate();
@@ -549,7 +549,7 @@ function RosterDrawer({ section, onClose }: { section: AcademicSection; onClose:
           </DialogDescription>
         </DialogHeader>
         {rosterQuery.isLoading ? (
-          <TableSkeleton rows={6} cols={2} />
+          <TableSkeleton rows={6} cols={2} paged={false} />
         ) : enrolled.length === 0 ? (
           <p className="text-sm text-muted-foreground">No students enrolled in this section yet.</p>
         ) : (

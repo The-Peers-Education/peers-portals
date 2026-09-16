@@ -97,7 +97,7 @@ export default function AcademicExamsPage() {
       <AcademicsNav />
 
       {examsQuery.isLoading ? (
-        <TableSkeleton rows={4} cols={3} />
+        <TableSkeleton rows={4} cols={3} paged={false} />
       ) : (
         <DataTable
           columns={columns}

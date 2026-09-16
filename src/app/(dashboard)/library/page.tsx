@@ -225,7 +225,7 @@ export default function LibraryPage() {
       />
 
       <Tabs value={tab} onValueChange={(value) => setTab(value as typeof tab)}>
-        <TabsList className="bg-cloud/60">
+        <TabsList className="max-w-full overflow-x-auto bg-cloud/60">
           <TabsTrigger value="catalog">Catalog</TabsTrigger>
           <TabsTrigger value="loans">Active loans</TabsTrigger>
         </TabsList>
@@ -250,7 +250,7 @@ export default function LibraryPage() {
             />
           </div>
           {booksQuery.isLoading ? (
-            <TableSkeleton rows={6} />
+            <TableSkeleton rows={6} cols={5} />
           ) : (
             <DataTable
               columns={bookColumns}
@@ -261,7 +261,7 @@ export default function LibraryPage() {
           )}
         </>
       ) : loansQuery.isLoading ? (
-        <TableSkeleton rows={6} />
+        <TableSkeleton rows={6} cols={6} />
       ) : activeLoans.length === 0 ? (
         <EmptyHint
           icon={BookOpen}

@@ -7,7 +7,7 @@ import { ArrowLeft, UserCog } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyHint } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { ProfileHubSkeleton } from "@/components/shared/Skeleton";
 import { StaffProfileView } from "@/components/staff/StaffProfileView";
 import { staffApi } from "@/lib/api";
 import { canManageStaff } from "@/lib/rbac";
@@ -32,7 +32,7 @@ export default function StaffMemberPage() {
   if (profileQuery.isLoading) {
     return (
       <PageShell>
-        <TableSkeleton rows={6} cols={2} />
+        <ProfileHubSkeleton tabs={4} />
       </PageShell>
     );
   }

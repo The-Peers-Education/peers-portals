@@ -7,7 +7,7 @@ import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyHint } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { ProfileHubSkeleton } from "@/components/shared/Skeleton";
 import { StudentProfileHub } from "@/components/students/StudentProfileHub";
 import { studentsApi } from "@/lib/api";
 import { portalPath } from "@/lib/paths";
@@ -29,7 +29,7 @@ export default function StudentProfilePage() {
   if (profileQuery.isLoading) {
     return (
       <PageShell>
-        <TableSkeleton rows={6} cols={2} />
+        <ProfileHubSkeleton />
       </PageShell>
     );
   }

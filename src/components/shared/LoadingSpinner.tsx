@@ -9,24 +9,32 @@ export function LoadingSpinner({
   label?: string;
   fullPage?: boolean;
 }) {
-  const body = (
-    <div
+  const spinner = (
+    <span
       className={cn(
-        "flex flex-col items-center justify-center gap-2 text-muted-foreground",
+        "animate-spin rounded-full border-cloud border-t-deep-navy",
+        fullPage ? "size-12 border-[3px]" : "size-6 border-2",
         className,
       )}
-    >
-      <span
-        className="size-6 animate-spin rounded-full border-2 border-cloud border-t-primary"
-        aria-hidden
-      />
-      <p className="text-sm">{label}…</p>
-    </div>
+      aria-hidden
+    />
   );
 
   if (fullPage) {
-    return <div className="flex min-h-[50vh] items-center justify-center">{body}</div>;
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center bg-background"
+        role="status"
+        aria-label={label}
+      >
+        {spinner}
+      </div>
+    );
   }
 
-  return body;
+  return (
+    <div className="flex items-center justify-center" role="status" aria-label={label}>
+      {spinner}
+    </div>
+  );
 }

@@ -225,14 +225,14 @@ export default function StaffPage() {
       />
 
       {staffQuery.isLoading ? (
-        <TableSkeleton rows={5} cols={6} />
+        <TableSkeleton rows={5} cols={7} />
       ) : (
         <DataTable
           columns={columns}
           data={staffQuery.data ?? []}
           rowKey={(row) => row.id}
           empty="No staff members found for this campus."
-          tableClassName="table-fixed"
+          tableClassName="lg:table-fixed"
         />
       )}
 

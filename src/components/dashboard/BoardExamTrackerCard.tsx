@@ -35,7 +35,7 @@ export function BoardExamTrackerCard({
               <CalendarClock className="size-4" strokeWidth={1.75} />
               Next milestone
             </p>
-            <p className="mt-1 font-display text-lg font-semibold">{countdown.title}</p>
+            <p className="mt-1 font-display text-lg font-semibold break-words">{countdown.title}</p>
             <p className="text-sm text-white/80">
               {formatDate(countdown.date)} ·{" "}
               {countdown.daysRemaining === 0

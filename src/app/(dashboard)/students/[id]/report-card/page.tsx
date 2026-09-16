@@ -17,7 +17,7 @@ import {
 import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { ReportSheetSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi } from "@/lib/api";
 import { printDocument } from "@/lib/pdf";
 import { portalPath } from "@/lib/paths";
@@ -103,7 +103,7 @@ export default function StudentReportCardPage() {
       </div>
 
       {reportQuery.isLoading ? (
-        <TableSkeleton rows={6} cols={5} />
+        <ReportSheetSkeleton />
       ) : reportQuery.data ? (
         <div
           id="printable-report-card"

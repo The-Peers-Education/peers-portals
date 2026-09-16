@@ -25,7 +25,7 @@ import {
 import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { CardListSkeleton } from "@/components/shared/Skeleton";
 import { HomeworkStatusBadge } from "@/components/shared/StatusBadge";
 import { academicsApi, homeworkApi } from "@/lib/api";
 import { canEnterGrades } from "@/lib/rbac";
@@ -155,7 +155,7 @@ export default function HomeworkPage() {
           description="Pick a class and section to view assigned homework."
         />
       ) : homeworkQuery.isLoading ? (
-        <TableSkeleton rows={5} />
+        <CardListSkeleton />
       ) : (homeworkQuery.data ?? []).length === 0 ? (
         <EmptyHint
           icon={CirclePlus}

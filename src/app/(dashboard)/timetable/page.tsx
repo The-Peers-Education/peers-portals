@@ -24,7 +24,7 @@ import {
 import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { TimetableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi, payrollApi, timetableApi } from "@/lib/api";
 import { canManageTimetable } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
@@ -287,7 +287,7 @@ export default function TimetablePage() {
           Choose a class and section, or a teacher, to load the weekly grid.
         </p>
       ) : loading ? (
-        <TableSkeleton rows={6} cols={7} />
+        <TimetableSkeleton />
       ) : (
         <div className="overflow-x-auto rounded-[10px] border border-cloud bg-white">
           <table className="w-full min-w-[720px] text-sm">

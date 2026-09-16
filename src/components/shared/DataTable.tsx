@@ -121,27 +121,32 @@ export function DataTable<T>({
               onClick={() => setPage((current) => Math.max(1, current - 1))}
             >
               <ChevronLeft className="size-4" strokeWidth={1.75} />
-              Previous
+              <span className="hidden sm:inline">Previous</span>
             </Button>
-            {pageNumbers(currentPage, pageCount).map((item, index) =>
-              item === "gap" ? (
-                <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground">
-                  …
-                </span>
-              ) : (
-                <Button
-                  key={item}
-                  type="button"
-                  variant={item === currentPage ? "default" : "outline"}
-                  size="icon-xs"
-                  aria-label={`Page ${item}`}
-                  aria-current={item === currentPage ? "page" : undefined}
-                  onClick={() => setPage(item)}
-                >
-                  {item}
-                </Button>
-              ),
-            )}
+            <span className="px-1 text-sm text-muted-foreground sm:hidden">
+              {currentPage} / {pageCount}
+            </span>
+            <div className="hidden sm:flex sm:flex-wrap sm:items-center sm:gap-1.5">
+              {pageNumbers(currentPage, pageCount).map((item, index) =>
+                item === "gap" ? (
+                  <span key={`gap-${index}`} className="px-1 text-sm text-muted-foreground">
+                    …
+                  </span>
+                ) : (
+                  <Button
+                    key={item}
+                    type="button"
+                    variant={item === currentPage ? "default" : "outline"}
+                    size="icon-xs"
+                    aria-label={`Page ${item}`}
+                    aria-current={item === currentPage ? "page" : undefined}
+                    onClick={() => setPage(item)}
+                  >
+                    {item}
+                  </Button>
+                ),
+              )}
+            </div>
             <Button
               type="button"
               variant="outline"
@@ -150,7 +155,7 @@ export function DataTable<T>({
               aria-label="Next page"
               onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
             >
-              Next
+              <span className="hidden sm:inline">Next</span>
               <ChevronRight className="size-4" strokeWidth={1.75} />
             </Button>
           </div>

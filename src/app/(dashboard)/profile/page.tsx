@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CircleUser } from "lucide-react";
 import { EmptyHint } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { TableSkeleton } from "@/components/shared/Skeleton";
+import { ProfileHubSkeleton } from "@/components/shared/Skeleton";
 import { StaffProfileView } from "@/components/staff/StaffProfileView";
 import { staffApi } from "@/lib/api";
 import { getErrorMessage } from "@/lib/utils";
@@ -23,7 +23,7 @@ function ProfilePageContent() {
   if (profileQuery.isLoading) {
     return (
       <PageShell>
-        <TableSkeleton rows={6} cols={2} />
+        <ProfileHubSkeleton tabs={5} />
       </PageShell>
     );
   }
@@ -50,7 +50,7 @@ export default function ProfilePage() {
     <Suspense
       fallback={
         <PageShell>
-          <TableSkeleton rows={6} cols={2} />
+          <ProfileHubSkeleton tabs={5} />
         </PageShell>
       }
     >

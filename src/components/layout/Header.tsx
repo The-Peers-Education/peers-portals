@@ -33,15 +33,16 @@ export function Header({
   }, []);
 
   return (
-    <header className="no-print sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-cloud bg-paper/95 px-4 backdrop-blur md:px-6">
-      <Image
-        src="/logo.png"
-        alt="The Peers Education System"
-        width={160}
-        height={40}
-        className="h-10 w-auto object-contain object-left lg:hidden"
-        priority
-      />
+    <header className="no-print sticky top-0 z-30 border-b border-cloud bg-paper/95 backdrop-blur">
+      <div className="mx-auto flex min-h-16 w-full max-w-screen-2xl items-center justify-between gap-2 px-3 sm:gap-3 sm:px-4 md:px-8">
+        <Image
+          src="/logo.png"
+          alt="The Peers Education System"
+          width={160}
+          height={40}
+          className="h-9 w-auto max-w-[7.25rem] object-contain object-left sm:h-10 sm:max-w-none lg:hidden"
+          priority
+        />
 
       <nav aria-label="Breadcrumb" className="hidden min-w-0 flex-1 lg:block">
         <ol className="flex min-w-0 items-center gap-2 text-sm">
@@ -67,21 +68,21 @@ export function Header({
         </ol>
       </nav>
 
-      <div className="flex shrink-0 items-center gap-3">
+      <div className="flex min-w-0 shrink-0 items-center gap-2 sm:gap-3">
         <button
           type="button"
           onClick={openPalette}
           aria-label="Open command palette"
           aria-keyshortcuts="Control+K Meta+K"
           className={cn(
-            "inline-flex h-11 w-44 items-center gap-2 rounded-[10px] border border-deep-navy/15 bg-white px-3 text-sm text-muted-foreground sm:w-64 md:w-80",
+            "inline-flex size-11 items-center justify-center rounded-[10px] border border-deep-navy/15 bg-white text-muted-foreground sm:h-11 sm:w-52 sm:justify-start sm:gap-2 sm:px-3 md:w-72 lg:w-80",
             clickable,
             focusRing,
           )}
         >
           <Search size={20} strokeWidth={1.75} aria-hidden className="shrink-0" />
-          <span className="min-w-0 flex-1 truncate text-left">Jump to…</span>
-          <kbd className="hidden shrink-0 font-sans text-xs text-muted-foreground sm:inline">{shortcut}</kbd>
+          <span className="hidden min-w-0 flex-1 truncate text-left text-sm sm:inline">Jump to…</span>
+          <kbd className="hidden shrink-0 font-sans text-xs text-muted-foreground md:inline">{shortcut}</kbd>
         </button>
         <BranchSwitcher placement="header" />
         <UserMenu />
@@ -104,6 +105,7 @@ export function Header({
             <Menu size={24} strokeWidth={2} aria-hidden />
           )}
         </button>
+      </div>
       </div>
     </header>
   );

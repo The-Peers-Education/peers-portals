@@ -5,7 +5,7 @@ import { Building2, CircleAlert } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
-import { StatCardSkeleton } from "@/components/shared/Skeleton";
+import { DashboardSkeleton } from "@/components/shared/Skeleton";
 import { FadeIn } from "@/components/ui/animations";
 import { FeeStatusDonut, FinanceTrendChart } from "@/components/dashboard/AnalyticsCharts";
 import { AcademicOverviewCard } from "@/components/dashboard/AcademicOverviewCard";
@@ -26,7 +26,7 @@ function KpiChip({
   badge?: { label: string; tone?: "positive" | "caution" };
 }) {
   return (
-    <div className="flex min-w-0 items-center justify-between gap-2 rounded-[10px] bg-card px-3 py-2 ring-1 ring-foreground/10">
+    <div className="flex min-w-0 flex-wrap items-center justify-between gap-2 rounded-[10px] bg-card px-3 py-2 ring-1 ring-foreground/10">
       <div className="min-w-0">
         <p className="truncate text-[11px] font-medium text-muted-foreground">{title}</p>
         <p className="truncate font-display text-lg font-semibold leading-tight text-deep-navy">{value}</p>
@@ -90,11 +90,7 @@ export default function DashboardPage() {
       </FadeIn>
 
       {loading || !analytics ? (
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, index) => (
-            <StatCardSkeleton key={index} />
-          ))}
-        </div>
+        <DashboardSkeleton />
       ) : (
         <>
           <div className="grid shrink-0 grid-cols-2 gap-2 md:grid-cols-4">
@@ -162,7 +158,7 @@ export default function DashboardPage() {
                   <CardDescription>Fee collections vs campus expenses over the last six months.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[280px]">
+                  <div className="h-[220px] sm:h-[280px]">
                     <FinanceTrendChart data={analytics.monthlyRevenueVsExpenses} />
                   </div>
                 </CardContent>
@@ -173,7 +169,7 @@ export default function DashboardPage() {
                   <CardDescription>Paid, partial, and outstanding challans.</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-[280px]">
+                  <div className="h-[220px] sm:h-[280px]">
                     <FeeStatusDonut breakdown={analytics.feeStatusBreakdown} />
                   </div>
                 </CardContent>
