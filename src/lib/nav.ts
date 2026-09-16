@@ -2,11 +2,13 @@ import {
   Banknote,
   CalendarCheck,
   CalendarRange,
+  ClipboardList,
   GraduationCap,
   LayoutGrid,
   Receipt,
   UserCog,
   Users,
+  UserRound,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -21,6 +23,12 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: NavItem[] = [
+  {
+    href: "/parent/dashboard",
+    label: "My children",
+    icon: UserRound,
+    roles: ROUTE_ROLES["/parent"],
+  },
   {
     href: "/dashboard",
     label: "Overview",
@@ -74,5 +82,11 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Expenses",
     icon: Wallet,
     roles: ROUTE_ROLES["/expenses"],
+  },
+  {
+    href: "/admissions",
+    label: "Admissions",
+    icon: ClipboardList,
+    roles: ROUTE_ROLES["/admissions"],
   },
 ];

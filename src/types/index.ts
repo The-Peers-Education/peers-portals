@@ -387,3 +387,119 @@ export interface PayrollSlip {
   createdAt: string;
   user?: Pick<User, "id" | "email" | "role">;
 }
+
+export type ParentRelationship = "FATHER" | "MOTHER" | "GUARDIAN";
+
+export type HomeworkSubmissionStatus = "PENDING" | "SUBMITTED" | "GRADED";
+
+export type AdmissionsLeadStatus =
+  | "NEW_INQUIRY"
+  | "CONTACTED"
+  | "INTERVIEW_SCHEDULED"
+  | "ADMITTED"
+  | "REJECTED";
+
+export interface ParentChild {
+  id: string;
+  fullName: string;
+  rollNumber: string;
+  classSection: string;
+  status: StudentStatus;
+  relationship: ParentRelationship;
+  attendancePercent: number | null;
+  unpaidBalance: number;
+  openHomework: number;
+  recentGrades: Array<{
+    subject: string;
+    marksObtained: number;
+    totalMarks: number;
+    letter: string | null;
+  }>;
+}
+
+export interface ParentHomeworkItem {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  subject: string;
+  submission: {
+    id: string;
+    submissionUrl: string;
+    status: HomeworkSubmissionStatus;
+    grade: string | null;
+  } | null;
+}
+
+export interface ParentAcademicSummary {
+  student: Pick<Student, "id" | "fullName" | "rollNumber" | "classSection" | "status">;
+  attendancePercent: number | null;
+  attendance: AttendanceRecord[];
+  unpaidBalance: number;
+  fees: Array<{
+    id: string;
+    month: number;
+    year: number;
+    amount: number;
+    paidAmount: number;
+    remainingBalance: number;
+    status: FeeStatus;
+  }>;
+  grades: Array<{
+    subject: string;
+    examTerm: string;
+    marksObtained: number;
+    totalMarks: number;
+    letter: string;
+  }>;
+  homework: ParentHomeworkItem[];
+}
+
+export interface HomeworkAssignment {
+  id: string;
+  sectionId: string;
+  subjectId: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  teacherId: string;
+  createdAt: string;
+  subject: { id: string; name: string; code: string };
+  teacher?: { id: string; email: string };
+  section?: { id: string; name: string; class: { id: string; name: string } };
+  submissions: Array<{
+    id: string;
+    homeworkId: string;
+    studentId: string;
+    submissionUrl: string;
+    status: HomeworkSubmissionStatus;
+    grade: string | null;
+    student?: Pick<Student, "id" | "fullName" | "rollNumber">;
+  }>;
+}
+
+export interface CreateHomeworkInput {
+  sectionId: string;
+  subjectId: string;
+  title: string;
+  description: string;
+  dueDate: string;
+}
+
+export interface AdmissionsLead {
+  id: string;
+  studentName: string;
+  guardianName: string;
+  guardianPhone: string;
+  guardianEmail: string;
+  targetClassId: string | null;
+  status: AdmissionsLeadStatus;
+  branchId: string;
+  notes: string | null;
+  inquiryId: string | null;
+  createdAt: string;
+  updatedAt: string;
+  enrolledStudentId?: string;
+  targetClass?: { id: string; name: string; code: string } | null;
+  inquiry?: { id: string; type: string; message: string; createdAt: string } | null;
+}

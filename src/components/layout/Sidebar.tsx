@@ -83,7 +83,7 @@ export function Sidebar({
               />
             </div>
             <span className="w-fit rounded-full bg-marigold px-2 py-0.5 text-xs font-semibold tracking-wide text-deep-navy">
-              Staff portal
+              {role === "PARENT" ? "Parent portal" : "Staff portal"}
             </span>
           </div>
           <button

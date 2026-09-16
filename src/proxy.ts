@@ -4,11 +4,16 @@ import { AUTH_COOKIE } from "@/lib/cookies";
 
 const PROTECTED_PREFIXES = [
   "/dashboard",
+  "/parent",
   "/students",
   "/staff",
   "/attendance",
+  "/academics",
+  "/timetable",
   "/fees",
+  "/payroll",
   "/expenses",
+  "/admissions",
 ];
 
 export function proxy(request: NextRequest) {

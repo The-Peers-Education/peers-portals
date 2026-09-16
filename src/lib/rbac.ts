@@ -21,6 +21,7 @@ export function isStaffRole(role?: Role | null) {
 
 export const ROUTE_ROLES: Record<string, Role[]> = {
   "/dashboard": STAFF_ROLES,
+  "/parent": ["PARENT"],
   "/students": STAFF_ROLES,
   "/staff": ["SUPER_ADMIN", "BRANCH_ADMIN"],
   "/attendance": ["SUPER_ADMIN", "BRANCH_ADMIN", "TEACHER"],
@@ -29,6 +30,7 @@ export const ROUTE_ROLES: Record<string, Role[]> = {
   "/fees": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/payroll": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/expenses": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
+  "/admissions": ["SUPER_ADMIN", "BRANCH_ADMIN"],
 };
 
 export function canAccessRoute(pathname: string, role?: Role | null) {
@@ -78,4 +80,12 @@ export function canManagePayroll(role?: Role | null) {
 
 export function canSubmitLeave(role?: Role | null) {
   return isStaffRole(role);
+}
+
+export function canManageAdmissions(role?: Role | null) {
+  return role === "SUPER_ADMIN" || role === "BRANCH_ADMIN";
+}
+
+export function homePath(role?: Role | null) {
+  return role === "PARENT" ? "/parent/dashboard" : "/dashboard";
 }

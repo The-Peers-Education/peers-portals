@@ -9,7 +9,7 @@ import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 import { SkipLink } from "@/components/shared/SkipLink";
 import { PageTransition } from "@/components/ui/animations";
 import { authApi, branchesApi } from "@/lib/api";
-import { canAccessRoute, isStaffRole } from "@/lib/rbac";
+import { canAccessRoute, homePath, isStaffRole } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 
@@ -59,13 +59,13 @@ export default function DashboardLayout({
       router.replace("/login");
       return;
     }
-    if (user && !isStaffRole(user.role)) {
+    if (user && user.role !== "PARENT" && !isStaffRole(user.role)) {
       clearAuth();
       router.replace("/login");
       return;
     }
     if (user && !canAccessRoute(pathname, user.role)) {
-      router.replace("/dashboard");
+      router.replace(homePath(user.role));
     }
   }, [hasHydrated, token, user, pathname, router, clearAuth, meQuery.isError]);
 

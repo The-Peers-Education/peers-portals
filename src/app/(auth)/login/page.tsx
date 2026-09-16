@@ -11,7 +11,7 @@ import { FadeIn } from "@/components/ui/animations";
 import { Field } from "@/components/shared/Field";
 import { PasswordInput } from "@/components/shared/PasswordInput";
 import { authApi } from "@/lib/api";
-import { isStaffRole } from "@/lib/rbac";
+import { homePath, isStaffRole } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -20,6 +20,7 @@ const DEMO_ACCOUNTS = [
   { role: "Branch Admin", email: "branchadmin@thepeers.edu.pk" },
   { role: "Accountant", email: "accountant@thepeers.edu.pk" },
   { role: "Teacher", email: "teacher@thepeers.edu.pk" },
+  { role: "Parent", email: "parent@thepeers.edu.pk" },
 ];
 
 export default function LoginPage() {
@@ -35,8 +36,8 @@ export default function LoginPage() {
     setSubmitting(true);
     try {
       const result = await authApi.login({ email, password });
-      if (!isStaffRole(result.user.role)) {
-        toast.error("Parent accounts must use the dedicated Parent Portal.");
+      if (result.user.role !== "PARENT" && !isStaffRole(result.user.role)) {
+        toast.error("This account cannot access the portal.");
         return;
       }
       setSession(result.token, result.user);
@@ -46,8 +47,8 @@ export default function LoginPage() {
       } catch {
         // Profile enrichment is optional after a successful login.
       }
-      toast.success("Welcome back");
-      router.replace("/dashboard");
+      toast.success(result.user.role === "PARENT" ? "Welcome to the parent portal" : "Welcome back");
+      router.replace(homePath(result.user.role));
     } catch (error) {
       toast.error(getErrorMessage(error, "Unable to sign in"));
     } finally {
@@ -67,8 +68,8 @@ export default function LoginPage() {
             className="mx-auto mb-2 h-12 w-auto object-contain"
             priority
           />
-          <CardTitle className="font-display text-xl">Staff Portal</CardTitle>
-          <CardDescription>Sign in with your school account to continue.</CardDescription>
+          <CardTitle className="font-display text-xl">School Portal</CardTitle>
+          <CardDescription>Sign in with your staff or parent account to continue.</CardDescription>
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-4" onSubmit={onSubmit}>

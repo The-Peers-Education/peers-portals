@@ -38,6 +38,12 @@ import type {
   TimetableSlot,
   TimetableTeacher,
   UpsertTimetableSlotInput,
+  ParentChild,
+  ParentAcademicSummary,
+  HomeworkAssignment,
+  CreateHomeworkInput,
+  AdmissionsLead,
+  AdmissionsLeadStatus,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
@@ -231,4 +237,25 @@ export const payrollApi = {
   }) => api.post<ApiResponse<LeaveRequest>>("/staff/leave", payload).then(unwrap),
   reviewLeave: (id: string, status: Extract<LeaveStatus, "APPROVED" | "REJECTED">) =>
     api.patch<ApiResponse<LeaveRequest>>(`/staff/leave/${id}`, { status }).then(unwrap),
+};
+
+export const parentApi = {
+  children: () => api.get<ApiResponse<ParentChild[]>>("/parent/children").then(unwrap),
+  academicSummary: (studentId: string) =>
+    api.get<ApiResponse<ParentAcademicSummary>>(`/parent/child/${studentId}/academic-summary`).then(unwrap),
+};
+
+export const homeworkApi = {
+  create: (payload: CreateHomeworkInput) =>
+    api.post<ApiResponse<HomeworkAssignment>>("/homework", payload).then(unwrap),
+  listBySection: (sectionId: string) =>
+    api.get<ApiResponse<HomeworkAssignment[]>>(`/homework/section/${sectionId}`).then(unwrap),
+  submit: (id: string, payload: { studentId: string; submissionUrl: string }) =>
+    api.post<ApiResponse<{ id: string; status: string }>>(`/homework/${id}/submit`, payload).then(unwrap),
+};
+
+export const admissionsApi = {
+  listLeads: () => api.get<ApiResponse<AdmissionsLead[]>>("/admissions/leads").then(unwrap),
+  updateStatus: (id: string, payload: { status: AdmissionsLeadStatus; notes?: string }) =>
+    api.patch<ApiResponse<AdmissionsLead>>(`/admissions/leads/${id}/status`, payload).then(unwrap),
 };

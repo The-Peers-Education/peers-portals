@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, FeeStatus, LeaveStatus, PayrollStatus, StudentStatus } from "@/types";
+import type { AttendanceStatus, FeeStatus, HomeworkSubmissionStatus, LeaveStatus, PayrollStatus, StudentStatus, AdmissionsLeadStatus } from "@/types";
 
 const TONE = {
   navy: "border-transparent bg-deep-navy text-white",
@@ -87,6 +87,32 @@ export function LeaveStatusBadge({ status }: { status: LeaveStatus }) {
 
 export function PayrollStatusBadge({ status }: { status: PayrollStatus }) {
   const item = PAYROLL_STATUS[status];
+  if (!item) return null;
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+const HOMEWORK_STATUS: Record<HomeworkSubmissionStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  PENDING: { icon: CircleAlert, label: "Pending", tone: "gold" },
+  SUBMITTED: { icon: Clock, label: "Submitted", tone: "cloud" },
+  GRADED: { icon: CircleCheck, label: "Graded", tone: "navy" },
+};
+
+const ADMISSIONS_STATUS: Record<AdmissionsLeadStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  NEW_INQUIRY: { icon: CircleAlert, label: "New inquiry", tone: "gold" },
+  CONTACTED: { icon: Clock, label: "Contacted", tone: "cloud" },
+  INTERVIEW_SCHEDULED: { icon: GraduationCap, label: "Interview", tone: "leaf" },
+  ADMITTED: { icon: CircleCheck, label: "Admitted", tone: "navy" },
+  REJECTED: { icon: CircleX, label: "Rejected", tone: "cloud" },
+};
+
+export function HomeworkStatusBadge({ status }: { status: HomeworkSubmissionStatus }) {
+  const item = HOMEWORK_STATUS[status];
+  if (!item) return null;
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+export function AdmissionsStatusBadge({ status }: { status: AdmissionsLeadStatus }) {
+  const item = ADMISSIONS_STATUS[status];
   if (!item) return null;
   return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
 }

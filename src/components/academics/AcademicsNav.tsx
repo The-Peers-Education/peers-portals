@@ -8,6 +8,7 @@ const LINKS = [
   { href: "/academics/classes", label: "Classes" },
   { href: "/academics/exams", label: "Exam terms" },
   { href: "/academics/grades", label: "Gradebook" },
+  { href: "/academics/homework", label: "Homework" },
 ];
 
 export function AcademicsNav() {
