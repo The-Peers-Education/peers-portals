@@ -177,11 +177,14 @@
   #printable-challan,
   #printable-challan *,
   #printable-report-card,
-  #printable-report-card * {
+  #printable-report-card *,
+  #printable-payslip,
+  #printable-payslip * {
     visibility: visible !important;
   }
   #printable-challan,
-  #printable-report-card {
+  #printable-report-card,
+  #printable-payslip {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;

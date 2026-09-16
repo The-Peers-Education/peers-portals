@@ -298,3 +298,92 @@ export interface GradeBatchInput {
     remarks?: string;
   }>;
 }
+
+export type DayOfWeek = "MON" | "TUE" | "WED" | "THU" | "FRI" | "SAT";
+
+export type LeaveType = "CASUAL" | "SICK" | "UNPAID";
+
+export type LeaveStatus = "PENDING" | "APPROVED" | "REJECTED";
+
+export type PayrollStatus = "PENDING" | "PAID";
+
+export interface Classroom {
+  id: string;
+  roomNumber: string;
+  capacity: number;
+  branchId: string;
+}
+
+export interface TimetableTeacher {
+  id: string;
+  email: string;
+  role: Role;
+}
+
+export interface TimetableSlot {
+  id: string;
+  sectionId: string;
+  subjectId: string;
+  teacherId: string;
+  classroomId: string;
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+  branchId: string;
+  section: {
+    id: string;
+    name: string;
+    class: { id: string; name: string; code: string };
+  };
+  subject: { id: string; name: string; code: string; classId: string };
+  classroom: { id: string; roomNumber: string; capacity: number };
+  teacher: TimetableTeacher;
+}
+
+export interface UpsertTimetableSlotInput {
+  id?: string;
+  sectionId: string;
+  subjectId: string;
+  teacherId: string;
+  classroomId: string;
+  dayOfWeek: DayOfWeek;
+  startTime: string;
+  endTime: string;
+}
+
+export interface StaffSalaryProfile {
+  userId: string;
+  email: string;
+  role: Role;
+  isActive: boolean;
+  baseSalary: number | null;
+  designation: string | null;
+  joinedDate: string | null;
+  profileId: string | null;
+}
+
+export interface LeaveRequest {
+  id: string;
+  userId: string;
+  leaveType: LeaveType;
+  startDate: string;
+  endDate: string;
+  status: LeaveStatus;
+  reason: string;
+  createdAt: string;
+  user?: Pick<User, "id" | "email" | "role">;
+}
+
+export interface PayrollSlip {
+  id: string;
+  userId: string;
+  month: number;
+  year: number;
+  baseSalary: number;
+  deductions: number;
+  netSalary: number;
+  status: PayrollStatus;
+  paidAt?: string | null;
+  createdAt: string;
+  user?: Pick<User, "id" | "email" | "role">;
+}

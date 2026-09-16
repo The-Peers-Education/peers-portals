@@ -1,8 +1,10 @@
 import {
   Banknote,
   CalendarCheck,
+  CalendarRange,
   GraduationCap,
   LayoutGrid,
+  Receipt,
   UserCog,
   Users,
   Wallet,
@@ -50,10 +52,22 @@ export const NAV_ITEMS: NavItem[] = [
     roles: ROUTE_ROLES["/academics"],
   },
   {
+    href: "/timetable",
+    label: "Timetable",
+    icon: CalendarRange,
+    roles: ROUTE_ROLES["/timetable"],
+  },
+  {
     href: "/fees",
     label: "Fees",
     icon: Banknote,
     roles: ROUTE_ROLES["/fees"],
+  },
+  {
+    href: "/payroll",
+    label: "Payroll",
+    icon: Receipt,
+    roles: ROUTE_ROLES["/payroll"],
   },
   {
     href: "/expenses",

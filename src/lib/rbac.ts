@@ -25,7 +25,9 @@ export const ROUTE_ROLES: Record<string, Role[]> = {
   "/staff": ["SUPER_ADMIN", "BRANCH_ADMIN"],
   "/attendance": ["SUPER_ADMIN", "BRANCH_ADMIN", "TEACHER"],
   "/academics": ["SUPER_ADMIN", "BRANCH_ADMIN", "TEACHER"],
+  "/timetable": ["SUPER_ADMIN", "BRANCH_ADMIN", "TEACHER"],
   "/fees": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
+  "/payroll": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/expenses": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
 };
 
@@ -64,4 +66,16 @@ export function canManageAcademics(role?: Role | null) {
 
 export function canEnterGrades(role?: Role | null) {
   return canMarkAttendance(role);
+}
+
+export function canManageTimetable(role?: Role | null) {
+  return canManageAcademics(role);
+}
+
+export function canManagePayroll(role?: Role | null) {
+  return canManageFees(role);
+}
+
+export function canSubmitLeave(role?: Role | null) {
+  return isStaffRole(role);
 }

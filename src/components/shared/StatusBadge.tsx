@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, FeeStatus, StudentStatus } from "@/types";
+import type { AttendanceStatus, FeeStatus, LeaveStatus, PayrollStatus, StudentStatus } from "@/types";
 
 const TONE = {
   navy: "border-transparent bg-deep-navy text-white",
@@ -63,6 +63,27 @@ export function FeeStatusBadge({ status }: { status: FeeStatus }) {
 
 export function StudentStatusBadge({ status }: { status: StudentStatus }) {
   const item = STUDENT_STATUS[status];
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+const LEAVE_STATUS: Record<LeaveStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  PENDING: { icon: CircleAlert, label: "Pending", tone: "gold" },
+  APPROVED: { icon: CircleCheck, label: "Approved", tone: "navy" },
+  REJECTED: { icon: CircleX, label: "Rejected", tone: "cloud" },
+};
+
+const PAYROLL_STATUS: Record<PayrollStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  PAID: { icon: CircleCheck, label: "Paid", tone: "navy" },
+  PENDING: { icon: CircleAlert, label: "Pending", tone: "gold" },
+};
+
+export function LeaveStatusBadge({ status }: { status: LeaveStatus }) {
+  const item = LEAVE_STATUS[status];
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+export function PayrollStatusBadge({ status }: { status: PayrollStatus }) {
+  const item = PAYROLL_STATUS[status];
   return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
 }
 

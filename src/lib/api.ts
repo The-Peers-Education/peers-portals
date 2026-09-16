@@ -29,6 +29,15 @@ import type {
   GradeBatchInput,
   Gradebook,
   ReportCard,
+  Classroom,
+  LeaveRequest,
+  LeaveStatus,
+  LeaveType,
+  PayrollSlip,
+  StaffSalaryProfile,
+  TimetableSlot,
+  TimetableTeacher,
+  UpsertTimetableSlotInput,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
@@ -185,4 +194,41 @@ export const academicsApi = {
         params: examTermId ? { examTermId } : undefined,
       })
       .then(unwrap),
+};
+
+export const timetableApi = {
+  listRooms: () => api.get<ApiResponse<Classroom[]>>("/timetable/rooms").then(unwrap),
+  createRoom: (payload: { roomNumber: string; capacity?: number }) =>
+    api.post<ApiResponse<Classroom>>("/timetable/rooms", payload).then(unwrap),
+  listTeachers: () => api.get<ApiResponse<TimetableTeacher[]>>("/timetable/teachers").then(unwrap),
+  sectionSchedule: (sectionId: string) =>
+    api.get<ApiResponse<TimetableSlot[]>>(`/timetable/section/${sectionId}`).then(unwrap),
+  teacherSchedule: (teacherId: string) =>
+    api.get<ApiResponse<TimetableSlot[]>>(`/timetable/teacher/${teacherId}`).then(unwrap),
+  upsertSlot: (payload: UpsertTimetableSlotInput) =>
+    api.post<ApiResponse<TimetableSlot>>("/timetable/slots", payload).then(unwrap),
+};
+
+export const payrollApi = {
+  list: (params?: { month?: number; year?: number }) =>
+    api.get<ApiResponse<PayrollSlip[]>>("/payroll", { params }).then(unwrap),
+  generate: (payload: { month: number; year: number }) =>
+    api.post<ApiResponse<PayrollSlip[]>>("/payroll/generate", payload).then(unwrap),
+  markPaid: (id: string) => api.patch<ApiResponse<PayrollSlip>>(`/payroll/${id}/pay`).then(unwrap),
+  listProfiles: () => api.get<ApiResponse<StaffSalaryProfile[]>>("/payroll/profiles").then(unwrap),
+  upsertProfile: (payload: {
+    userId: string;
+    baseSalary: number;
+    designation: string;
+    joinedDate: string;
+  }) => api.post<ApiResponse<StaffSalaryProfile>>("/payroll/profiles", payload).then(unwrap),
+  listLeaves: () => api.get<ApiResponse<LeaveRequest[]>>("/staff/leave").then(unwrap),
+  submitLeave: (payload: {
+    leaveType: LeaveType;
+    startDate: string;
+    endDate: string;
+    reason: string;
+  }) => api.post<ApiResponse<LeaveRequest>>("/staff/leave", payload).then(unwrap),
+  reviewLeave: (id: string, status: Extract<LeaveStatus, "APPROVED" | "REJECTED">) =>
+    api.patch<ApiResponse<LeaveRequest>>(`/staff/leave/${id}`, { status }).then(unwrap),
 };
