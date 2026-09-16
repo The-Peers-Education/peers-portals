@@ -1,3 +1,5 @@
+"use client";
+
 import Image from "next/image";
 import { PayrollStatusBadge } from "@/components/shared/StatusBadge";
 import { formatMonthYear, formatPkr } from "@/lib/utils";

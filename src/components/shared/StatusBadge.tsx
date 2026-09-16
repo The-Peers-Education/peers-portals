@@ -1,3 +1,5 @@
+"use client";
+
 import {
   ArrowRightLeft,
   CalendarOff,
@@ -79,11 +81,13 @@ const PAYROLL_STATUS: Record<PayrollStatus, { icon: LucideIcon; label: string; t
 
 export function LeaveStatusBadge({ status }: { status: LeaveStatus }) {
   const item = LEAVE_STATUS[status];
+  if (!item) return null;
   return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
 }
 
 export function PayrollStatusBadge({ status }: { status: PayrollStatus }) {
   const item = PAYROLL_STATUS[status];
+  if (!item) return null;
   return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
 }
 
