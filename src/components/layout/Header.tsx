@@ -66,9 +66,9 @@ export function Header({
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
         >
           {menuOpen ? (
-            <X size={22} strokeWidth={2} aria-hidden />
+            <X size={24} strokeWidth={2} aria-hidden />
           ) : (
-            <Menu size={22} strokeWidth={2} aria-hidden />
+            <Menu size={24} strokeWidth={2} aria-hidden />
           )}
         </button>
       </div>

@@ -22,8 +22,8 @@ export function StatCard({
           <CardDescription>{title}</CardDescription>
           <CardTitle className="mt-1 text-2xl font-semibold tracking-tight">{value}</CardTitle>
         </div>
-        <div className="flex size-10 items-center justify-center rounded-[10px] bg-marigold/20 text-deep-navy">
-          <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+        <div className="flex size-11 items-center justify-center rounded-[10px] bg-marigold/20 text-deep-navy">
+          <Icon className="size-6" strokeWidth={1.75} aria-hidden />
         </div>
       </CardHeader>
       {hint ? (

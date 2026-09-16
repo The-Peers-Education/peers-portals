@@ -5,7 +5,7 @@ import { cn } from "cn"
 import { Dialog as DialogPrimitive } from "radix-ui"
 
 import { Button } from "@/components/ui/button"
-import { X } from "lucide-react"
+import { CloseIconButton } from "@/components/shared/CloseIconButton"
 
 function Dialog({
   ...props
@@ -50,11 +50,8 @@ function DialogOverlay({
 function DialogContent({
   className,
   children,
-  showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
+}: React.ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -67,30 +64,32 @@ function DialogContent({
         {...props}
       >
         {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close data-slot="dialog-close" asChild>
-            <Button
-              variant="ghost"
-              className="absolute top-2 right-2"
-              size="icon"
-              aria-label="Close dialog"
-            >
-              <X className="size-4" strokeWidth={2} aria-hidden />
-            </Button>
-          </DialogPrimitive.Close>
-        )}
       </DialogPrimitive.Content>
     </DialogPortal>
   )
 }
 
-function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
+function DialogHeader({
+  className,
+  children,
+  showCloseButton = true,
+  ...props
+}: React.ComponentProps<"div"> & {
+  showCloseButton?: boolean
+}) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2", className)}
+      className={cn("flex items-start justify-between gap-3", className)}
       {...props}
-    />
+    >
+      <div className="flex min-w-0 flex-1 flex-col gap-2">{children}</div>
+      {showCloseButton ? (
+        <DialogPrimitive.Close data-slot="dialog-close" asChild>
+          <CloseIconButton aria-label="Close dialog" />
+        </DialogPrimitive.Close>
+      ) : null}
+    </div>
   )
 }
 

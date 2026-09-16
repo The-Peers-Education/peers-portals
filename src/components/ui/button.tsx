@@ -2,16 +2,15 @@ import * as React from "react"
 import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "cn"
 import { Slot } from "radix-ui"
-import { clickable, ease, focusRing, hoverShadow } from "@/lib/styles"
+import { clickable, ease, focusRing } from "@/lib/styles"
 
 const buttonVariants = cva(
   cn(
-    "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border border-transparent bg-clip-padding text-base font-normal whitespace-nowrap select-none",
+    "group/button inline-flex shrink-0 items-center justify-center rounded-[10px] border border-transparent bg-clip-padding text-[15px] font-normal whitespace-nowrap select-none",
     clickable,
     ease,
     focusRing,
-    hoverShadow,
-    "disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    "disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-5",
   ),
   {
     variants: {
@@ -29,8 +28,8 @@ const buttonVariants = cva(
       },
       size: {
         default: "h-11 min-h-11 gap-2 px-4",
-        xs: "h-9 min-h-9 gap-1 px-2.5 text-sm",
-        sm: "h-10 min-h-10 gap-1.5 px-3 text-sm",
+        xs: "h-9 min-h-9 gap-1 px-2.5",
+        sm: "h-10 min-h-10 gap-1.5 px-3",
         lg: "h-12 min-h-12 gap-2 px-5",
         icon: "size-11",
         "icon-xs": "size-9",

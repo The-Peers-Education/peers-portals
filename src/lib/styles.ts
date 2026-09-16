@@ -12,9 +12,9 @@ export const focusRing =
 export const focusRingOnNavy =
   "outline-none focus-visible:ring-2 focus-visible:ring-marigold focus-visible:ring-offset-2 focus-visible:ring-offset-sidebar";
 
-/** Elevation only on hover (fine pointer), never as a resting state. */
-export const hoverShadow =
-  "lg:[@media(hover:hover)_and_(pointer:fine)]:hover:shadow-[0_10px_24px_-10px_rgba(27,58,92,0.45)]";
+/** Form controls: recolor the existing border only, no extra ring. */
+export const focusField =
+  "outline-none ring-0 shadow-none focus:!border-deep-navy focus-visible:!border-deep-navy focus:ring-0 focus-visible:ring-0 focus:shadow-none";
 
 export const clickable =
   "cursor-pointer disabled:cursor-not-allowed disabled:opacity-60";

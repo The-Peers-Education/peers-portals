@@ -38,13 +38,13 @@ export function BranchSwitcher({
     return (
       <div
         className={cn(
-          "flex items-center gap-2 rounded-[10px] border px-3 py-2 text-sm",
+          "flex items-center gap-2 rounded-[10px] border px-3 py-2 text-[15px]",
           inSidebar
             ? "w-full min-w-0 border-white/20 bg-white text-deep-navy lg:hidden"
             : "hidden border-deep-navy/15 bg-white lg:flex",
         )}
       >
-        <Building2 className="size-4 shrink-0 text-deep-navy" strokeWidth={1.75} aria-hidden />
+        <Building2 className="size-5 shrink-0 text-deep-navy" strokeWidth={1.75} aria-hidden />
         <span className={cn("min-w-0 text-deep-navy", inSidebar ? "truncate" : "whitespace-nowrap")}>
           {user?.branch?.name ?? "Assigned branch"}
         </span>
@@ -76,7 +76,7 @@ export function BranchSwitcher({
           )}
           aria-label="Select campus"
         >
-          <Building2 className="size-4 shrink-0 text-deep-navy" strokeWidth={1.75} aria-hidden />
+          <Building2 className="size-5 shrink-0 text-deep-navy" strokeWidth={1.75} aria-hidden />
           <SelectValue placeholder="Select campus" />
         </SelectTrigger>
         <SelectContent>

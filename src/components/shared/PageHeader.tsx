@@ -34,7 +34,7 @@ export function EmptyHint({
   return (
     <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
       <div className="flex size-11 items-center justify-center rounded-full bg-muted text-muted-foreground">
-        <Icon className="size-5" strokeWidth={1.75} aria-hidden />
+        <Icon className="size-6" strokeWidth={1.75} aria-hidden />
       </div>
       <p className="font-medium">{title}</p>
       <p className="max-w-sm text-sm text-muted-foreground">{description}</p>

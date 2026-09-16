@@ -34,7 +34,7 @@ function StatusChip({
   return (
     <Badge
       variant="secondary"
-      className={cn("h-6 gap-1 rounded-full px-2 text-xs font-semibold", TONE[tone], className)}
+      className={cn("h-7 gap-1 rounded-full px-2 text-[13px] font-semibold", TONE[tone], className)}
     >
       <Icon className="size-3.5" strokeWidth={2.25} aria-hidden />
       <span>{label}</span>

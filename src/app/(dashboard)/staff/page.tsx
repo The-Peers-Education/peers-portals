@@ -178,7 +178,7 @@ export default function StaffPage() {
         description="Invite campus staff and keep roles aligned with their duties."
         action={
           <Button onClick={() => setOpen(true)}>
-            <CirclePlus className="size-4" strokeWidth={1.75} />
+            <CirclePlus className="size-5" strokeWidth={1.75} />
             Invite staff
           </Button>
         }

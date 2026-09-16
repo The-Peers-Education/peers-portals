@@ -29,11 +29,12 @@ export default function DashboardLayout({
   const setActiveBranchId = useAuthStore((state) => state.setActiveBranchId);
   const clearAuth = useAuthStore((state) => state.clearAuth);
 
-  const { data: profile } = useQuery({
+  const meQuery = useQuery({
     queryKey: ["me"],
     queryFn: authApi.me,
     enabled: hasHydrated && Boolean(token),
   });
+  const profile = meQuery.data;
 
   const { data: branches } = useQuery({
     queryKey: ["branches"],
@@ -53,7 +54,8 @@ export default function DashboardLayout({
 
   useEffect(() => {
     if (!hasHydrated) return;
-    if (!token) {
+    if (!token || (!user && meQuery.isError)) {
+      clearAuth();
       router.replace("/login");
       return;
     }
@@ -65,7 +67,7 @@ export default function DashboardLayout({
     if (user && !canAccessRoute(pathname, user.role)) {
       router.replace("/dashboard");
     }
-  }, [hasHydrated, token, user, pathname, router, clearAuth]);
+  }, [hasHydrated, token, user, pathname, router, clearAuth, meQuery.isError]);
 
   if (!hasHydrated || !token || !user) {
     return <LoadingSpinner fullPage label="Preparing portal" />;

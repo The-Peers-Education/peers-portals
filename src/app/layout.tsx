@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist_Mono, Inter, Manrope } from "next/font/google";
 import { AppProviders } from "@/components/providers";
 import "./globals.css";
+import "./field-focus.css";
 
 const manrope = Manrope({
   variable: "--font-manrope",

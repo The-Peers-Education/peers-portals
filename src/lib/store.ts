@@ -55,9 +55,14 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         activeBranchId: state.activeBranchId,
       }),
-      onRehydrateStorage: () => (state) => {
-        state?.setHasHydrated(true);
-        if (state?.token) setAuthCookie();
+      onRehydrateStorage: () => (state, error) => {
+        const next = error ? useAuthStore.getState() : state;
+        next?.setHasHydrated(true);
+        if (next?.token) {
+          setAuthCookie();
+        } else {
+          clearAuthCookie();
+        }
       },
     },
   ),

@@ -144,18 +144,18 @@ export default function DashboardPage() {
         <CardContent className="flex flex-wrap gap-3">
           {canMarkAttendance(user?.role) ? (
             <Link href="/attendance" className={cn(buttonVariants())}>
-              <CalendarCheck className="size-4" strokeWidth={1.75} />
+              <CalendarCheck className="size-5" strokeWidth={1.75} />
               Mark Attendance
             </Link>
           ) : null}
           {canManageFees(user?.role) ? (
             <Link href="/fees" className={cn(buttonVariants({ variant: "outline" }))}>
-              <Banknote className="size-4" strokeWidth={1.75} />
+              <Banknote className="size-5" strokeWidth={1.75} />
               Issue Fee Challan
             </Link>
           ) : null}
           <Link href="/students" className={cn(buttonVariants({ variant: "outline" }))}>
-            <Users className="size-4" strokeWidth={1.75} />
+            <Users className="size-5" strokeWidth={1.75} />
             Open Student Directory
           </Link>
         </CardContent>

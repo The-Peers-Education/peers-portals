@@ -29,9 +29,9 @@ export function PasswordInput({
           className="absolute top-1/2 right-1.5 inline-flex size-9 -translate-y-1/2 cursor-pointer items-center justify-center rounded-[10px] text-muted-foreground transition-colors hover:bg-cloud hover:text-deep-navy focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-deep-navy"
         >
           {visible ? (
-            <EyeOff className="size-4" strokeWidth={1.75} aria-hidden />
+            <EyeOff className="size-5" strokeWidth={1.75} aria-hidden />
           ) : (
-            <Eye className="size-4" strokeWidth={1.75} aria-hidden />
+            <Eye className="size-5" strokeWidth={1.75} aria-hidden />
           )}
         </button>
       </Tooltip>

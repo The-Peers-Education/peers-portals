@@ -82,7 +82,7 @@ export function Sidebar({
                 priority
               />
             </div>
-            <span className="w-fit rounded-full bg-marigold px-2 py-0.5 text-[10px] font-semibold tracking-wide text-deep-navy">
+            <span className="w-fit rounded-full bg-marigold px-2 py-0.5 text-xs font-semibold tracking-wide text-deep-navy">
               Staff portal
             </span>
           </div>
@@ -95,7 +95,7 @@ export function Sidebar({
             onClick={onClose}
             aria-label="Close navigation"
           >
-            <X size={22} strokeWidth={2} aria-hidden />
+            <X size={24} strokeWidth={2} aria-hidden />
           </button>
         </div>
 
@@ -111,7 +111,7 @@ export function Sidebar({
                   onClick={onClose}
                   aria-current={active ? "page" : undefined}
                   className={cn(
-                    "relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 py-2 text-sm font-medium transition-colors",
+                    "relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] font-medium leading-none transition-colors",
                     focusRingOnNavy,
                     active
                       ? "bg-sidebar-accent text-white"
@@ -125,7 +125,7 @@ export function Sidebar({
                       transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
                     />
                   ) : null}
-                  <Icon className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+                  <Icon className="size-6 shrink-0" strokeWidth={1.75} aria-hidden />
                   {item.label}
                 </Link>
               );
@@ -136,17 +136,17 @@ export function Sidebar({
         <div className="mt-auto flex flex-col gap-3 border-t border-sidebar-border p-4">
           <BranchSwitcher placement="sidebar" />
           <div className="flex min-w-0 flex-col gap-0.5">
-            <p className="truncate text-sm font-medium">{user?.email}</p>
-            <p className="text-xs text-sidebar-foreground">
+            <p className="truncate text-[15px] font-medium">{user?.email}</p>
+            <p className="text-sm text-sidebar-foreground">
               {role ? ROLE_LABELS[role] : "Staff"}
             </p>
           </div>
           <Button
             variant="outline"
-            className="w-full border-white/20 bg-transparent text-white hover:bg-white/10 hover:text-white"
+            className="w-full border-white/20 bg-transparent text-[15px] text-white hover:bg-white/10 hover:text-white"
             onClick={logout}
           >
-            <LogOut className="size-4" strokeWidth={1.75} aria-hidden />
+            <LogOut className="size-6" strokeWidth={1.75} aria-hidden />
             Logout
           </Button>
         </div>

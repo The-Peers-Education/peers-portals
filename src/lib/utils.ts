@@ -4,12 +4,29 @@ import type { ApiResponse } from "@/types";
 
 export function getErrorMessage(error: unknown, fallback = "Something went wrong") {
   if (error instanceof AxiosError) {
+    const status = error.response?.status;
     const apiMessage = (error.response?.data as ApiResponse | undefined)?.message;
+    if (status === 429) {
+      return apiMessage || "Too many requests. Please wait a moment and try again.";
+    }
+    if (error.code === "ECONNABORTED" || /timeout/i.test(error.message)) {
+      return "The server took too long to respond. Please try again.";
+    }
+    if (!error.response) {
+      return "Cannot reach the server. Check your connection and try again.";
+    }
     if (apiMessage) return apiMessage;
     if (error.message) return error.message;
   }
   if (error instanceof Error && error.message) return error.message;
   return fallback;
+}
+
+export function isReachabilityError(error: unknown) {
+  if (!(error instanceof AxiosError)) return false;
+  if (error.response?.status === 429) return true;
+  if (error.code === "ECONNABORTED" || /timeout/i.test(error.message)) return true;
+  return !error.response;
 }
 
 export function toAmount(value: string | number | null | undefined) {

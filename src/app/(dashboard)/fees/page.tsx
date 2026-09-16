@@ -164,7 +164,7 @@ export default function FeesPage() {
       cell: (row) => (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="outline" onClick={() => setReceipt(row)}>
-            <Receipt className="size-3.5" strokeWidth={1.75} />
+            <Receipt className="size-4" strokeWidth={1.75} />
             Receipt
           </Button>
           {row.status === "PAID" ? null : (
@@ -232,7 +232,7 @@ export default function FeesPage() {
         description="Issue challans, record partial collections, and print receipts."
         action={
           <Button onClick={() => setOpen(true)}>
-            <CirclePlus className="size-4" strokeWidth={1.75} />
+            <CirclePlus className="size-5" strokeWidth={1.75} />
             Issue challan
           </Button>
         }
@@ -440,7 +440,7 @@ export default function FeesPage() {
               Close
             </Button>
             <Button type="button" onClick={() => window.print()}>
-              <Printer className="size-4" strokeWidth={1.75} />
+              <Printer className="size-5" strokeWidth={1.75} />
               Print
             </Button>
           </DialogFooter>

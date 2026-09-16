@@ -1,18 +1,21 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useAuthStore } from "@/lib/store";
 
+function markHydrated() {
+  useAuthStore.getState().setHasHydrated(true);
+}
+
 export function useHasHydrated() {
-  const [hydrated, setHydrated] = useState(false);
+  const hasHydrated = useAuthStore((state) => state.hasHydrated);
 
   useEffect(() => {
-    const finish = () => setHydrated(true);
-    const unsubscribe = useAuthStore.persist.onFinishHydration(finish);
-    void useAuthStore.persist.rehydrate();
-    if (useAuthStore.persist.hasHydrated()) finish();
+    const unsubscribe = useAuthStore.persist.onFinishHydration(markHydrated);
+    void Promise.resolve(useAuthStore.persist.rehydrate()).then(markHydrated, markHydrated);
+    if (useAuthStore.persist.hasHydrated()) markHydrated();
     return unsubscribe;
   }, []);
 
-  return hydrated;
+  return hasHydrated;
 }

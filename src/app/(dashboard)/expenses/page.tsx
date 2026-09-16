@@ -99,7 +99,7 @@ export default function ExpensesPage() {
         description={`Branch spend to date: ${formatPkr(total)}`}
         action={
           <Button onClick={() => setOpen(true)}>
-            <CirclePlus className="size-4" strokeWidth={1.75} />
+            <CirclePlus className="size-5" strokeWidth={1.75} />
             Log expense
           </Button>
         }

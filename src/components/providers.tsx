@@ -1,13 +1,28 @@
 "use client";
 
 import { useState } from "react";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
+import { toast } from "sonner";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { getErrorMessage, isReachabilityError } from "@/lib/utils";
+
+let lastReachabilityToastAt = 0;
+
+function notifyReachability(error: unknown) {
+  if (!isReachabilityError(error)) return;
+  const now = Date.now();
+  if (now - lastReachabilityToastAt < 4000) return;
+  lastReachabilityToastAt = now;
+  toast.error(getErrorMessage(error, "Unable to reach the server"));
+}
 
 function createQueryClient() {
   return new QueryClient({
+    queryCache: new QueryCache({
+      onError: notifyReachability,
+    }),
     defaultOptions: {
       queries: {
         staleTime: 20_000,

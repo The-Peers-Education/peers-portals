@@ -20,7 +20,7 @@ function ToastIcon({
 }) {
   return (
     <span
-      className={`flex size-7 shrink-0 items-center justify-center rounded-full ${className}`}
+      className={`flex size-9 shrink-0 items-center justify-center rounded-full ${className}`}
     >
       {children}
     </span>
@@ -37,27 +37,27 @@ const Toaster = ({ ...props }: ToasterProps) => {
       icons={{
         success: (
           <ToastIcon className="bg-leaf/15 text-leaf">
-            <CircleCheck className="size-4" strokeWidth={2.25} />
+            <CircleCheck className="size-6" strokeWidth={2.25} />
           </ToastIcon>
         ),
         info: (
           <ToastIcon className="bg-deep-navy/10 text-deep-navy">
-            <Info className="size-4" strokeWidth={2.25} />
+            <Info className="size-6" strokeWidth={2.25} />
           </ToastIcon>
         ),
         warning: (
           <ToastIcon className="bg-marigold/20 text-deep-navy">
-            <CircleAlert className="size-4" strokeWidth={2.25} />
+            <CircleAlert className="size-6" strokeWidth={2.25} />
           </ToastIcon>
         ),
         error: (
           <ToastIcon className="bg-red-600/10 text-red-700">
-            <CircleX className="size-4" strokeWidth={2.25} />
+            <CircleX className="size-6" strokeWidth={2.25} />
           </ToastIcon>
         ),
         loading: (
           <ToastIcon className="bg-cloud text-deep-navy">
-            <LoaderCircle className="size-4 animate-spin" strokeWidth={2.25} />
+            <LoaderCircle className="size-6 animate-spin" strokeWidth={2.25} />
           </ToastIcon>
         ),
       }}

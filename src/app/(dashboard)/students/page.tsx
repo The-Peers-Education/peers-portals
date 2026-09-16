@@ -153,7 +153,7 @@ export default function StudentsPage() {
             });
           }}
         >
-          <Pencil className="size-3.5" strokeWidth={1.75} />
+          <Pencil className="size-4" strokeWidth={1.75} />
           {canEdit ? "Edit" : "View"}
         </Button>
       ),
@@ -214,27 +214,32 @@ export default function StudentsPage() {
         action={
           canEdit ? (
             <Button onClick={() => setOpen(true)}>
-              <CirclePlus className="size-4" strokeWidth={1.75} />
+              <CirclePlus className="size-5" strokeWidth={1.75} />
               Register student
             </Button>
           ) : null
         }
       />
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" strokeWidth={1.75} aria-hidden />
+          <Search
+            className="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-muted-foreground"
+            strokeWidth={1.75}
+            aria-hidden
+          />
           <Input
             id="student-search"
-            label="Search by name or roll number"
-            labelClassName="left-10"
+            type="search"
+            placeholder="Name or roll number"
+            aria-label="Search students"
             className="pl-10"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
         <Select value={classFilter} onValueChange={setClassFilter}>
-          <SelectTrigger className="w-full bg-background sm:w-52" aria-label="Filter by class">
+          <SelectTrigger className="w-full bg-white sm:w-52" aria-label="Filter by class">
             <SelectValue placeholder="All classes" />
           </SelectTrigger>
           <SelectContent>

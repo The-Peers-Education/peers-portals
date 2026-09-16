@@ -2,8 +2,7 @@
 
 import { useEffect } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { X } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { CloseIconButton } from "@/components/shared/CloseIconButton";
 import { cn } from "@/lib/utils";
 
 export function SlideOver({
@@ -73,9 +72,7 @@ export function SlideOver({
                 </h2>
                 {description ? <p className="mt-1 text-sm text-muted-foreground">{description}</p> : null}
               </div>
-              <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close">
-                <X className="size-4" strokeWidth={2} aria-hidden />
-              </Button>
+              <CloseIconButton onClick={onClose} />
             </div>
             <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
             {footer ? (
