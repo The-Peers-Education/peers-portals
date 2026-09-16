@@ -21,7 +21,7 @@ export function BoardExamTrackerCard({
   const countdown = next?.status === "COMPLETE" ? null : next;
 
   return (
-    <Card>
+    <Card className="overflow-x-hidden">
       <CardHeader>
         <CardTitle>BISE Lahore board tracker</CardTitle>
         <CardDescription>
@@ -48,13 +48,13 @@ export function BoardExamTrackerCard({
         ) : (
           <p className="text-sm text-muted-foreground">All listed BISE Lahore milestones are complete.</p>
         )}
-        <ul className="grid gap-2">
+        <ul className="grid max-h-[calc(4*3.55rem+3*0.5rem)] gap-2 overflow-y-auto overflow-x-hidden overscroll-contain pr-1">
           {milestones.map((item) => {
             const status = STATUS[item.status];
             return (
               <li
                 key={item.id}
-                className="flex items-start justify-between gap-3 rounded-[10px] border border-cloud px-3 py-2"
+                className="flex min-h-[3.55rem] items-start justify-between gap-3 rounded-[10px] border border-cloud px-3 py-2"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[15px] font-medium text-deep-navy">{item.title}</span>

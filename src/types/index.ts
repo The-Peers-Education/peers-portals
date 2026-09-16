@@ -741,6 +741,7 @@ export interface DashboardAnalytics {
   overallAcademicStanding: "EXCELLENT" | "SATISFACTORY" | "NEEDS_ATTENTION";
   topPerformingClass: { className: string; averageScore: number } | null;
   needsAttentionClass: { className: string; averageScore: number } | null;
+  classPerformance: Array<{ className: string; averageScore: number }>;
   boardMilestones: Array<{
     id: string;
     title: string;

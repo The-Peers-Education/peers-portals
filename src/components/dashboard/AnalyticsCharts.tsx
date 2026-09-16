@@ -32,7 +32,7 @@ export function FinanceTrendChart({
   data: DashboardAnalytics["monthlyRevenueVsExpenses"];
 }) {
   return (
-    <div className="h-[280px] w-full">
+    <div className="h-full min-h-[140px] w-full">
       <ResponsiveContainer width="100%" height="100%">
         <BarChart data={data} barGap={6}>
           <CartesianGrid stroke="#e6dfd0" vertical={false} />
@@ -48,8 +48,8 @@ export function FinanceTrendChart({
             formatter={(value) => formatPkr(Number(value ?? 0))}
           />
           <Legend />
-          <Bar dataKey="collectedFees" name="Fees collected" fill={NAVY} radius={[6, 6, 0, 0]} />
           <Bar dataKey="expenses" name="Expenses" fill={MARIGOLD} radius={[6, 6, 0, 0]} />
+          <Bar dataKey="collectedFees" name="Fees collected" fill={NAVY} radius={[6, 6, 0, 0]} />
         </BarChart>
       </ResponsiveContainer>
     </div>
@@ -62,14 +62,14 @@ export function FeeStatusDonut({
   breakdown: DashboardAnalytics["feeStatusBreakdown"];
 }) {
   const data = [
+    { name: "Outstanding", value: breakdown.pendingCount, color: NAVY },
     { name: "Paid", value: breakdown.paidCount, color: LEAF },
     { name: "Partial", value: breakdown.partialCount, color: MARIGOLD },
-    { name: "Outstanding", value: breakdown.pendingCount, color: NAVY },
   ];
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   return (
-    <div className="h-[280px] w-full">
+    <div className="h-full min-h-[140px] w-full">
       {total === 0 ? (
         <p className="flex h-full items-center justify-center text-sm text-muted-foreground">
           No fee challans for this campus yet.
@@ -103,7 +103,7 @@ export function AttendanceMeter({
   ];
 
   return (
-    <div className="flex h-[280px] flex-col justify-center gap-5">
+    <div className="flex min-h-[15.5rem] flex-col justify-center gap-5">
       <div>
         <p className="text-4xl font-semibold tracking-tight text-deep-navy">
           {overview.presentPercentage}%

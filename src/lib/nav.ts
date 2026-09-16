@@ -32,7 +32,7 @@ export const NAV_ITEMS: NavItem[] = [
   },
   {
     path: "/dashboard",
-    label: "Overview",
+    label: "Dashboard",
     icon: LayoutGrid,
     roles: ROUTE_ROLES["/dashboard"],
   },

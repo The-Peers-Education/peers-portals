@@ -1,7 +1,7 @@
 import type { Role } from "@/types";
 
 const SEGMENT_LABELS: Record<string, string> = {
-  dashboard: "Overview",
+  dashboard: "Dashboard",
   students: "Students",
   staff: "Staff",
   attendance: "Attendance",
@@ -44,8 +44,7 @@ export function headerBreadcrumbs(appPath: string, role?: Role | null): Breadcru
   const path = appPath.replace(/\/$/, "") || home;
 
   if (path === "/dashboard") {
-    crumbs.push({ label: "Overview" });
-    return crumbs;
+    return [{ label: "Dashboard" }];
   }
   if (path === "/parent/dashboard") {
     crumbs.push({ label: "My children" });

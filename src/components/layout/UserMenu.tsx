@@ -42,45 +42,40 @@ export function UserMenu() {
 
   if (!user) return null;
 
-  const pillClass = cn(
-    "hidden max-w-[16rem] items-center gap-2 rounded-[10px] px-2 py-1.5 text-left lg:inline-flex",
-    clickable,
-    focusRing,
-    "hover:bg-cloud",
-  );
+  const canOpenProfile = user.role !== "PARENT";
 
   return (
-    <div className="hidden items-center lg:flex">
-      {user.role === "PARENT" ? (
-        <p className={pillClass}>
-          <ProfileIcon className="size-8" />
-          <span className="min-w-0 truncate text-[15px] font-medium text-deep-navy">{name}</span>
-        </p>
-      ) : (
-        <Link href={portalPath(user.role, "/profile")} className={pillClass} aria-label="Open my profile">
-          <ProfileIcon className="size-8" />
-          <span className="min-w-0 truncate text-[15px] font-medium text-deep-navy">{name}</span>
-        </Link>
-      )}
-      <DropdownMenu>
-        <DropdownMenuTrigger
-          className={cn(
-            "inline-flex size-8 items-center justify-center rounded-[10px] text-deep-navy",
-            clickable,
-            focusRing,
-            "hover:bg-cloud",
-          )}
-          aria-label="Account options"
-        >
-          <ChevronDown className="size-5" strokeWidth={1.75} />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" avoidCollisions className="w-44 min-w-44">
-          <DropdownMenuItem className="cursor-pointer gap-2 px-2 py-2 text-[15px] no-underline" onSelect={logout}>
-            <LogOut className="size-5" strokeWidth={1.75} />
-            Sign out
+    <DropdownMenu>
+      <DropdownMenuTrigger
+        className={cn(
+          "group hidden max-w-[16rem] items-center gap-2 rounded-[10px] px-2 py-1.5 text-left lg:inline-flex",
+          clickable,
+          focusRing,
+          "hover:bg-cloud data-[state=open]:bg-cloud",
+        )}
+        aria-label="Account menu"
+      >
+        <ProfileIcon className="size-8" />
+        <span className="min-w-0 truncate text-[15px] font-medium text-deep-navy">{name}</span>
+        <ChevronDown
+          className="size-5 shrink-0 text-deep-navy transition-transform group-data-[state=open]:rotate-180"
+          strokeWidth={1.75}
+        />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" avoidCollisions className="min-w-48">
+        {canOpenProfile ? (
+          <DropdownMenuItem asChild className="cursor-pointer gap-2 px-2 py-2 text-[15px]">
+            <Link href={portalPath(user.role, "/profile")}>
+              <CircleUser className="size-5" strokeWidth={1.75} />
+              Open profile
+            </Link>
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        ) : null}
+        <DropdownMenuItem className="cursor-pointer gap-2 px-2 py-2 text-[15px]" onSelect={logout}>
+          <LogOut className="size-5" strokeWidth={1.75} />
+          Sign out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
