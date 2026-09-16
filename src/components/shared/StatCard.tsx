@@ -8,6 +8,7 @@ export function StatCard({
   hint,
   icon: Icon,
   trend,
+  badge,
   className,
 }: {
   title: string;
@@ -15,6 +16,7 @@ export function StatCard({
   hint?: string;
   icon: LucideIcon;
   trend?: { value: number; label?: string };
+  badge?: { label: string; tone?: "positive" | "caution" | "neutral" };
   className?: string;
 }) {
   const trendUp = (trend?.value ?? 0) >= 0;
@@ -29,8 +31,22 @@ export function StatCard({
           <Icon className="size-6" strokeWidth={1.75} aria-hidden />
         </div>
       </CardHeader>
-      {hint || trend ? (
+      {hint || trend || badge ? (
         <CardContent className="flex flex-col gap-1">
+          {badge ? (
+            <span
+              className={cn(
+                "inline-flex w-fit rounded-full px-2 py-0.5 text-xs font-semibold",
+                badge.tone === "caution"
+                  ? "bg-destructive/10 text-destructive"
+                  : badge.tone === "neutral"
+                    ? "bg-cloud text-deep-navy"
+                    : "bg-leaf/15 text-leaf",
+              )}
+            >
+              {badge.label}
+            </span>
+          ) : null}
           {trend ? (
             <p className={cn("text-sm font-medium", trendUp ? "text-leaf" : "text-destructive")}>
               {trendUp ? "+" : ""}

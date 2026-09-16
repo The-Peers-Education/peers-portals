@@ -8,6 +8,8 @@ import {
   CalendarCheck,
   CircleAlert,
   Receipt,
+  UserMinus,
+  UserPlus,
   Users,
   Wallet,
 } from "lucide-react";
@@ -23,6 +25,8 @@ import {
   FeeStatusDonut,
   FinanceTrendChart,
 } from "@/components/dashboard/AnalyticsCharts";
+import { AcademicOverviewCard } from "@/components/dashboard/AcademicOverviewCard";
+import { BoardExamTrackerCard } from "@/components/dashboard/BoardExamTrackerCard";
 import { dashboardApi } from "@/lib/api";
 import { canMarkAttendance } from "@/lib/rbac";
 import { portalPath } from "@/lib/paths";
@@ -84,6 +88,31 @@ export default function DashboardPage() {
         </div>
       ) : (
         <>
+          <StaggerContainer className="grid gap-4 sm:grid-cols-2">
+            <StaggerItem>
+              <StatCard
+                title="New enrolments"
+                value={String(analytics.newStudentsThisMonth)}
+                hint="Students registered this month"
+                icon={UserPlus}
+                badge={{ label: "Growth", tone: "positive" }}
+                trend={{ value: analytics.newStudentsChangePct }}
+              />
+            </StaggerItem>
+            <StaggerItem>
+              <StatCard
+                title="Students left"
+                value={String(analytics.studentsLeftThisMonth)}
+                hint="Withdrawn, transferred, or inactive this month"
+                icon={UserMinus}
+                badge={{
+                  label: analytics.studentsLeftThisMonth > 0 ? "Churn" : "Stable",
+                  tone: analytics.studentsLeftThisMonth > 0 ? "caution" : "positive",
+                }}
+              />
+            </StaggerItem>
+          </StaggerContainer>
+
           <StaggerContainer className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StaggerItem>
               <StatCard
@@ -133,6 +162,11 @@ export default function DashboardPage() {
               </StaggerItem>
             )}
           </StaggerContainer>
+
+          <div className="grid gap-4 xl:grid-cols-2">
+            <AcademicOverviewCard analytics={analytics} />
+            <BoardExamTrackerCard milestones={analytics.boardMilestones} />
+          </div>
 
           <div className="grid gap-4 xl:grid-cols-3">
             {analytics.canSeeFinance ? (
