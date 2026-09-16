@@ -1,4 +1,7 @@
-import { Children, cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
+"use client";
+
+import type { ReactNode } from "react";
+import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
 
 export function Field({
@@ -14,15 +17,11 @@ export function Field({
   className?: string;
   children: ReactNode;
 }) {
-  const child = Children.only(children);
-  const control = isValidElement(child)
-    ? cloneElement(child as ReactElement<{ id?: string; label?: string }>, { id, label })
-    : children;
-
   return (
-    <div className={cn(className)}>
-      {control}
-      {hint ? <p className="mt-1.5 text-sm text-muted-foreground">{hint}</p> : null}
+    <div className={cn("flex flex-col gap-1.5", className)}>
+      <Label htmlFor={id}>{label}</Label>
+      {children}
+      {hint ? <p className="text-sm text-muted-foreground">{hint}</p> : null}
     </div>
   );
 }

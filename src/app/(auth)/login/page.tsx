@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { FadeIn } from "@/components/ui/animations";
-import { Field } from "@/components/shared/Field";
 import { PasswordInput } from "@/components/shared/PasswordInput";
 import { authApi } from "@/lib/api";
 import { homePath, isStaffRole } from "@/lib/rbac";
@@ -73,25 +72,25 @@ export default function LoginPage() {
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-4" onSubmit={onSubmit}>
-            <Field id="email" label="Email">
-              <Input
-                id="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-              />
-            </Field>
-            <Field id="password" label="Password">
-              <PasswordInput
-                id="password"
-                autoComplete="current-password"
-                required
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-              />
-            </Field>
+            <Input
+              id="email"
+              label="Email"
+              floating
+              type="email"
+              autoComplete="email"
+              required
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+            />
+            <PasswordInput
+              id="password"
+              label="Password"
+              floating
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
             <Button type="submit" className="w-full" disabled={submitting}>
               {submitting ? "Signing in…" : "Sign in"}
             </Button>

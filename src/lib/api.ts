@@ -19,6 +19,7 @@ import type {
   StudentProfile,
   StudentStatus,
   UpdateStaffInput,
+  UpdateStaffProfileInput,
   UpdateStudentInput,
   User,
   AcademicClass,
@@ -44,6 +45,9 @@ import type {
   CreateHomeworkInput,
   AdmissionsLead,
   AdmissionsLeadStatus,
+  StaffProfile,
+  ChangePasswordInput,
+  DashboardAnalytics,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
@@ -111,6 +115,8 @@ export const authApi = {
   me: () => api.get<ApiResponse<User>>("/auth/me").then(unwrap),
   register: (payload: RegisterStaffInput) =>
     api.post<ApiResponse<AuthPayload>>("/auth/register", payload).then(unwrap),
+  changePassword: (payload: ChangePasswordInput) =>
+    api.patch<ApiResponse<{ updated: boolean }>>("/auth/change-password", payload).then(unwrap),
 };
 
 export const branchesApi = {
@@ -131,8 +137,14 @@ export const studentsApi = {
 
 export const staffApi = {
   list: () => api.get<ApiResponse<User[]>>("/staff").then(unwrap),
+  me: () => api.get<ApiResponse<StaffProfile>>("/staff/me").then(unwrap),
+  getById: (id: string) => api.get<ApiResponse<StaffProfile>>(`/staff/${id}`).then(unwrap),
   update: (id: string, payload: UpdateStaffInput) =>
     api.patch<ApiResponse<User>>(`/staff/${id}/role`, payload).then(unwrap),
+  updateProfile: (id: string, payload: UpdateStaffProfileInput) =>
+    api
+      .patch<ApiResponse<StaffProfile>>(id === "me" ? "/staff/me" : `/staff/${id}/profile`, payload)
+      .then(unwrap),
 };
 
 export const feesApi = {
@@ -258,4 +270,8 @@ export const admissionsApi = {
   listLeads: () => api.get<ApiResponse<AdmissionsLead[]>>("/admissions/leads").then(unwrap),
   updateStatus: (id: string, payload: { status: AdmissionsLeadStatus; notes?: string }) =>
     api.patch<ApiResponse<AdmissionsLead>>(`/admissions/leads/${id}/status`, payload).then(unwrap),
+};
+
+export const dashboardApi = {
+  analytics: () => api.get<ApiResponse<DashboardAnalytics>>("/dashboard/analytics").then(unwrap),
 };

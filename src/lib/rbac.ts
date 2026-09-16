@@ -1,4 +1,5 @@
 import type { Role } from "@/types";
+import { portalPath, toAppPathname } from "@/lib/paths";
 
 export const ROLE_LABELS: Record<Role, string> = {
   SUPER_ADMIN: "Super Admin",
@@ -31,13 +32,16 @@ export const ROUTE_ROLES: Record<string, Role[]> = {
   "/payroll": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/expenses": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/admissions": ["SUPER_ADMIN", "BRANCH_ADMIN"],
+  "/profile": STAFF_ROLES,
+  "/settings": STAFF_ROLES,
 };
 
 export function canAccessRoute(pathname: string, role?: Role | null) {
   if (!role) return false;
+  const path = toAppPathname(pathname);
   const match = Object.keys(ROUTE_ROLES)
     .sort((a, b) => b.length - a.length)
-    .find((route) => pathname === route || pathname.startsWith(`${route}/`));
+    .find((route) => path === route || path.startsWith(`${route}/`));
   if (!match) return true;
   return ROUTE_ROLES[match].includes(role);
 }
@@ -87,5 +91,5 @@ export function canManageAdmissions(role?: Role | null) {
 }
 
 export function homePath(role?: Role | null) {
-  return role === "PARENT" ? "/parent/dashboard" : "/dashboard";
+  return portalPath(role, "/dashboard");
 }

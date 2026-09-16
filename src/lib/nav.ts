@@ -9,6 +9,7 @@ import {
   UserCog,
   Users,
   UserRound,
+  CircleUser,
   Wallet,
   type LucideIcon,
 } from "lucide-react";
@@ -16,7 +17,7 @@ import type { Role } from "@/types";
 import { ROUTE_ROLES } from "@/lib/rbac";
 
 export interface NavItem {
-  href: string;
+  path: string;
   label: string;
   icon: LucideIcon;
   roles: Role[];
@@ -24,69 +25,75 @@ export interface NavItem {
 
 export const NAV_ITEMS: NavItem[] = [
   {
-    href: "/parent/dashboard",
+    path: "/parent/dashboard",
     label: "My children",
     icon: UserRound,
     roles: ROUTE_ROLES["/parent"],
   },
   {
-    href: "/dashboard",
+    path: "/dashboard",
     label: "Overview",
     icon: LayoutGrid,
     roles: ROUTE_ROLES["/dashboard"],
   },
   {
-    href: "/students",
+    path: "/students",
     label: "Students",
     icon: Users,
     roles: ROUTE_ROLES["/students"],
   },
   {
-    href: "/staff",
+    path: "/staff",
     label: "Staff",
     icon: UserCog,
     roles: ROUTE_ROLES["/staff"],
   },
   {
-    href: "/attendance",
+    path: "/attendance",
     label: "Attendance",
     icon: CalendarCheck,
     roles: ROUTE_ROLES["/attendance"],
   },
   {
-    href: "/academics",
+    path: "/academics",
     label: "Academics",
     icon: GraduationCap,
     roles: ROUTE_ROLES["/academics"],
   },
   {
-    href: "/timetable",
+    path: "/timetable",
     label: "Timetable",
     icon: CalendarRange,
     roles: ROUTE_ROLES["/timetable"],
   },
   {
-    href: "/fees",
+    path: "/fees",
     label: "Fees",
     icon: Banknote,
     roles: ROUTE_ROLES["/fees"],
   },
   {
-    href: "/payroll",
+    path: "/payroll",
     label: "Payroll",
     icon: Receipt,
     roles: ROUTE_ROLES["/payroll"],
   },
   {
-    href: "/expenses",
+    path: "/expenses",
     label: "Expenses",
     icon: Wallet,
     roles: ROUTE_ROLES["/expenses"],
   },
   {
-    href: "/admissions",
+    path: "/admissions",
     label: "Admissions",
     icon: ClipboardList,
     roles: ROUTE_ROLES["/admissions"],
+  },
+  {
+    path: "/profile",
+    label: "My profile",
+    icon: CircleUser,
+    roles: ROUTE_ROLES["/profile"],
   },
 ];

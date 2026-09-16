@@ -124,12 +124,12 @@ export default function ExpensesPage() {
           </DialogHeader>
           <form className="grid gap-3" onSubmit={onSubmit}>
             <div className="grid gap-1.5">
-              <Label>Category</Label>
+              <Label htmlFor="expense-category">Category</Label>
               <Select
                 value={form.category}
                 onValueChange={(value) => setForm((current) => ({ ...current, category: value }))}
               >
-                <SelectTrigger className="w-full" aria-label="Expense category">
+                <SelectTrigger id="expense-category" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>

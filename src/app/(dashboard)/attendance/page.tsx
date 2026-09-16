@@ -131,9 +131,9 @@ export default function AttendancePage() {
           onChange={(event) => setDate(event.target.value)}
         />
         <div className="grid gap-1.5">
-          <Label>Class / Section</Label>
+          <Label htmlFor="attendance-class">Class / Section</Label>
           <Select value={classFilter} onValueChange={setClassFilter}>
-            <SelectTrigger className="w-full bg-background" aria-label="Filter attendance by class">
+            <SelectTrigger id="attendance-class" className="w-full bg-background">
               <SelectValue placeholder="All classes" />
             </SelectTrigger>
             <SelectContent>

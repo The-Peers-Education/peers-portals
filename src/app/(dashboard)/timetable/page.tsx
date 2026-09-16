@@ -21,13 +21,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi, payrollApi, timetableApi } from "@/lib/api";
 import { canManageTimetable } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
-import { getErrorMessage, todayKey } from "@/lib/utils";
+import { formatTimeRange, getErrorMessage, todayKey } from "@/lib/utils";
 import type { DayOfWeek, LeaveType, TimetableSlot } from "@/types";
 
 const DAYS: Array<{ id: DayOfWeek; label: string }> = [
@@ -206,22 +207,25 @@ export default function TimetablePage() {
       />
 
       <div className="grid gap-3 lg:grid-cols-4">
+        <Field id="timetable-view" label="View">
         <Select
           value={view}
           onValueChange={(value) => {
             setView(value as "section" | "teacher");
           }}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Timetable view">
-            <SelectValue placeholder="View" />
+          <SelectTrigger id="timetable-view" className="w-full bg-white">
+            <SelectValue placeholder="Select view" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="section">By class / section</SelectItem>
             <SelectItem value="teacher">By teacher</SelectItem>
           </SelectContent>
         </Select>
+        </Field>
         {view === "section" ? (
           <>
+            <Field id="timetable-class" label="Class">
             <Select
               value={classId}
               onValueChange={(value) => {
@@ -229,8 +233,8 @@ export default function TimetablePage() {
                 setSectionId("");
               }}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Class">
-                <SelectValue placeholder="Class" />
+              <SelectTrigger id="timetable-class" className="w-full bg-white">
+                <SelectValue placeholder="Select class" />
               </SelectTrigger>
               <SelectContent>
                 {(classesQuery.data ?? []).map((item) => (
@@ -240,13 +244,15 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
+            <Field id="timetable-section" label="Section">
             <Select
               value={sectionId}
               onValueChange={setSectionId}
               disabled={!classId}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Section">
-                <SelectValue placeholder="Section" />
+              <SelectTrigger id="timetable-section" className="w-full bg-white">
+                <SelectValue placeholder="Select section" />
               </SelectTrigger>
               <SelectContent>
                 {sections.map((item) => (
@@ -256,11 +262,13 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
           </>
         ) : (
+          <Field id="timetable-teacher" label="Teacher">
           <Select value={teacherId} onValueChange={setTeacherId}>
-            <SelectTrigger className="w-full bg-white" aria-label="Teacher">
-              <SelectValue placeholder="Teacher" />
+            <SelectTrigger id="timetable-teacher" className="w-full bg-white">
+              <SelectValue placeholder="Select teacher" />
             </SelectTrigger>
             <SelectContent>
               {(teachersQuery.data ?? []).map((item) => (
@@ -270,6 +278,7 @@ export default function TimetablePage() {
               ))}
             </SelectContent>
           </Select>
+          </Field>
         )}
       </div>
 
@@ -296,7 +305,7 @@ export default function TimetablePage() {
               {PERIODS.map((period) => (
                 <tr key={period.startTime} className="border-b border-cloud">
                   <td className="whitespace-nowrap px-3 py-2 text-muted-foreground">
-                    {period.startTime}–{period.endTime}
+                    {formatTimeRange(period.startTime, period.endTime)}
                   </td>
                   {DAYS.map((day) => {
                     const slot = grid.get(`${day.id}-${period.startTime}`);
@@ -344,12 +353,13 @@ export default function TimetablePage() {
             </DialogDescription>
           </DialogHeader>
           <form className="grid gap-3" onSubmit={onSaveSlot}>
+            <Field id="slot-section" label="Section">
             <Select
               value={slotForm.sectionId}
               onValueChange={(value) => setSlotForm((current) => ({ ...current, sectionId: value, subjectId: "" }))}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Section">
-                <SelectValue placeholder="Section" />
+              <SelectTrigger id="slot-section" className="w-full bg-white">
+                <SelectValue placeholder="Select section" />
               </SelectTrigger>
               <SelectContent>
                 {(classesQuery.data ?? []).flatMap((item) =>
@@ -361,12 +371,14 @@ export default function TimetablePage() {
                 )}
               </SelectContent>
             </Select>
+            </Field>
+            <Field id="slot-subject" label="Subject">
             <Select
               value={slotForm.subjectId}
               onValueChange={(value) => setSlotForm((current) => ({ ...current, subjectId: value }))}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Subject">
-                <SelectValue placeholder="Subject" />
+              <SelectTrigger id="slot-subject" className="w-full bg-white">
+                <SelectValue placeholder="Select subject" />
               </SelectTrigger>
               <SelectContent>
                 {(
@@ -380,12 +392,14 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
+            <Field id="slot-teacher" label="Teacher">
             <Select
               value={slotForm.teacherId}
               onValueChange={(value) => setSlotForm((current) => ({ ...current, teacherId: value }))}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Teacher">
-                <SelectValue placeholder="Teacher" />
+              <SelectTrigger id="slot-teacher" className="w-full bg-white">
+                <SelectValue placeholder="Select teacher" />
               </SelectTrigger>
               <SelectContent>
                 {(teachersQuery.data ?? []).map((item) => (
@@ -395,12 +409,14 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
+            <Field id="slot-room" label="Room">
             <Select
               value={slotForm.classroomId}
               onValueChange={(value) => setSlotForm((current) => ({ ...current, classroomId: value }))}
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Classroom">
-                <SelectValue placeholder="Room" />
+              <SelectTrigger id="slot-room" className="w-full bg-white">
+                <SelectValue placeholder="Select room" />
               </SelectTrigger>
               <SelectContent>
                 {(roomsQuery.data ?? []).map((item) => (
@@ -410,6 +426,7 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
             <div className="grid grid-cols-2 gap-3">
               <Input
                 id="slot-start"
@@ -504,14 +521,15 @@ export default function TimetablePage() {
               leaveMutation.mutate(leaveForm);
             }}
           >
+            <Field id="leave-type" label="Leave type">
             <Select
               value={leaveForm.leaveType}
               onValueChange={(value) =>
                 setLeaveForm((current) => ({ ...current, leaveType: value as LeaveType }))
               }
             >
-              <SelectTrigger className="w-full bg-white" aria-label="Leave type">
-                <SelectValue placeholder="Leave type" />
+              <SelectTrigger id="leave-type" className="w-full bg-white">
+                <SelectValue placeholder="Select leave type" />
               </SelectTrigger>
               <SelectContent>
                 {LEAVE_TYPES.map((item) => (
@@ -521,6 +539,7 @@ export default function TimetablePage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
             <Input
               id="leave-start"
               label="Start date"

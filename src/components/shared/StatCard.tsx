@@ -7,14 +7,17 @@ export function StatCard({
   value,
   hint,
   icon: Icon,
+  trend,
   className,
 }: {
   title: string;
   value: string;
   hint?: string;
   icon: LucideIcon;
+  trend?: { value: number; label?: string };
   className?: string;
 }) {
+  const trendUp = (trend?.value ?? 0) >= 0;
   return (
     <Card className={cn("transition-[box-shadow] duration-500 hover:shadow-brand-lg", className)}>
       <CardHeader className="flex flex-row items-start justify-between gap-3">
@@ -26,9 +29,15 @@ export function StatCard({
           <Icon className="size-6" strokeWidth={1.75} aria-hidden />
         </div>
       </CardHeader>
-      {hint ? (
-        <CardContent>
-          <p className="text-xs text-muted-foreground">{hint}</p>
+      {hint || trend ? (
+        <CardContent className="flex flex-col gap-1">
+          {trend ? (
+            <p className={cn("text-sm font-medium", trendUp ? "text-leaf" : "text-destructive")}>
+              {trendUp ? "+" : ""}
+              {trend.value}% {trend.label ?? "vs last month"}
+            </p>
+          ) : null}
+          {hint ? <p className="text-xs text-muted-foreground">{hint}</p> : null}
         </CardContent>
       ) : null}
     </Card>

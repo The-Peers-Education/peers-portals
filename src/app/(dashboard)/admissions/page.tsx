@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
@@ -93,9 +95,13 @@ export default function AdmissionsPage() {
           description="Admission inquiries from the public website will appear in this pipeline."
         />
       ) : (
-        <div className="grid gap-4 xl:grid-cols-5">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex min-w-full gap-4">
           {COLUMNS.map((column) => (
-            <section key={column.status} className="flex min-h-48 flex-col gap-3 rounded-[12px] bg-cloud p-3">
+            <section
+              key={column.status}
+              className="flex min-h-48 w-[22rem] min-w-[22rem] flex-1 flex-col gap-3 rounded-[12px] bg-cloud p-3"
+            >
               <div className="flex items-center justify-between gap-2">
                 <h2 className="text-[15px] font-medium text-deep-navy">{column.title}</h2>
                 <span className="text-sm text-muted-foreground">{grouped[column.status]?.length ?? 0}</span>
@@ -112,14 +118,16 @@ export default function AdmissionsPage() {
                     </p>
                   </div>
                   <AdmissionsStatusBadge status={lead.status} />
-                  <input
+                  <Input
+                    id={`note-${lead.id}`}
+                    label="Note"
                     value={notes[lead.id] ?? ""}
                     onChange={(event) =>
                       setNotes((current) => ({ ...current, [lead.id]: event.target.value }))
                     }
                     placeholder="Add a note"
-                    className="h-11 rounded-[10px] border border-deep-navy/15 bg-white px-3 text-[15px] outline-none"
                   />
+                  <Field id={`status-${lead.id}`} label="Status">
                   <Select
                     value={lead.status}
                     onValueChange={(value) =>
@@ -131,7 +139,7 @@ export default function AdmissionsPage() {
                     }
                     disabled={updateMutation.isPending}
                   >
-                    <SelectTrigger className="w-full" aria-label="Move lead">
+                    <SelectTrigger id={`status-${lead.id}`} className="w-full">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -142,10 +150,12 @@ export default function AdmissionsPage() {
                       ))}
                     </SelectContent>
                   </Select>
+                  </Field>
                 </article>
               ))}
             </section>
           ))}
+          </div>
         </div>
       )}
     </PageShell>

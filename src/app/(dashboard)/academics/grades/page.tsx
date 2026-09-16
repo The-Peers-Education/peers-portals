@@ -3,7 +3,7 @@
 import { FormEvent, useMemo, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2 } from "lucide-react";
+import { Building2, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
 import { AcademicsNav } from "@/components/academics/AcademicsNav";
 import { Button } from "@/components/ui/button";
@@ -16,16 +16,19 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi } from "@/lib/api";
+import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
 import type { GradebookRow } from "@/types";
 
 export default function AcademicGradesPage() {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const branchId = useAuthStore((state) => state.activeBranchId ?? state.user?.branchId);
   const [classId, setClassId] = useState("");
   const [sectionId, setSectionId] = useState("");
@@ -106,6 +109,7 @@ export default function AcademicGradesPage() {
             type="number"
             min={0}
             className="h-10 min-h-10 w-28 px-2"
+            aria-label={`Marks obtained for ${row.fullName}`}
             value={draftFor(row).marksObtained}
             onChange={(event) => updateDraft(row.studentId, { marksObtained: event.target.value })}
           />
@@ -120,6 +124,7 @@ export default function AcademicGradesPage() {
             type="number"
             min={1}
             className="h-10 min-h-10 w-24 px-2"
+            aria-label={`Total marks for ${row.fullName}`}
             value={draftFor(row).totalMarks}
             onChange={(event) => updateDraft(row.studentId, { totalMarks: event.target.value })}
           />
@@ -132,6 +137,7 @@ export default function AcademicGradesPage() {
           <Input
             id={`remarks-${row.studentId}`}
             className="h-10 min-h-10 min-w-40 px-2"
+            aria-label={`Remarks for ${row.fullName}`}
             value={draftFor(row).remarks}
             onChange={(event) => updateDraft(row.studentId, { remarks: event.target.value })}
           />
@@ -143,14 +149,14 @@ export default function AcademicGradesPage() {
         className: "text-right",
         cell: (row) => (
           <Button size="sm" variant="outline" asChild>
-            <Link href={`/students/${row.studentId}/report-card?examTermId=${examTermId}`}>
+            <Link href={`${portalPath(user?.role, `/students/${row.studentId}/report-card`)}?examTermId=${examTermId}`}>
               Report card
             </Link>
           </Button>
         ),
       },
     ],
-    [drafts, examTermId, rows],
+    [drafts, examTermId, rows, user?.role],
   );
 
   function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -185,11 +191,22 @@ export default function AcademicGradesPage() {
     <PageShell>
       <PageHeader
         title="Gradebook"
-        description="Select Class → Section → Exam term → Subject, then enter marks for the roster."
+        description={
+          <span className="inline-flex flex-wrap items-center gap-1">
+            Select Class
+            <ChevronRight className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            Section
+            <ChevronRight className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            Exam term
+            <ChevronRight className="size-4 shrink-0" strokeWidth={1.75} aria-hidden />
+            Subject, then enter marks for the roster.
+          </span>
+        }
       />
       <AcademicsNav />
 
       <form className="grid gap-3 lg:grid-cols-5" onSubmit={onSubmit}>
+        <Field id="grade-class" label="Class">
         <Select
           value={classId}
           onValueChange={(value) => {
@@ -199,8 +216,8 @@ export default function AcademicGradesPage() {
             setDrafts({});
           }}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Class">
-            <SelectValue placeholder="Class" />
+          <SelectTrigger id="grade-class" className="w-full bg-white">
+            <SelectValue placeholder="Select class" />
           </SelectTrigger>
           <SelectContent>
             {(classesQuery.data ?? []).map((item) => (
@@ -210,6 +227,8 @@ export default function AcademicGradesPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
+        <Field id="grade-section" label="Section">
         <Select
           value={sectionId}
           onValueChange={(value) => {
@@ -218,8 +237,8 @@ export default function AcademicGradesPage() {
           }}
           disabled={!classId}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Section">
-            <SelectValue placeholder="Section" />
+          <SelectTrigger id="grade-section" className="w-full bg-white">
+            <SelectValue placeholder="Select section" />
           </SelectTrigger>
           <SelectContent>
             {sections.map((item) => (
@@ -229,6 +248,8 @@ export default function AcademicGradesPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
+        <Field id="grade-exam" label="Exam term">
         <Select
           value={examTermId}
           onValueChange={(value) => {
@@ -236,8 +257,8 @@ export default function AcademicGradesPage() {
             setDrafts({});
           }}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Exam term">
-            <SelectValue placeholder="Exam term" />
+          <SelectTrigger id="grade-exam" className="w-full bg-white">
+            <SelectValue placeholder="Select exam term" />
           </SelectTrigger>
           <SelectContent>
             {(examsQuery.data ?? []).map((exam) => (
@@ -247,6 +268,8 @@ export default function AcademicGradesPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
+        <Field id="grade-subject" label="Subject">
         <Select
           value={subjectId}
           onValueChange={(value) => {
@@ -255,8 +278,8 @@ export default function AcademicGradesPage() {
           }}
           disabled={!classId}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Subject">
-            <SelectValue placeholder="Subject" />
+          <SelectTrigger id="grade-subject" className="w-full bg-white">
+            <SelectValue placeholder="Select subject" />
           </SelectTrigger>
           <SelectContent>
             {subjects.map((item) => (
@@ -266,7 +289,8 @@ export default function AcademicGradesPage() {
             ))}
           </SelectContent>
         </Select>
-        <Button type="submit" disabled={!ready || saveMutation.isPending}>
+        </Field>
+        <Button type="submit" disabled={!ready || saveMutation.isPending} className="self-end">
           {saveMutation.isPending ? "Submitting…" : "Submit Grades"}
         </Button>
       </form>

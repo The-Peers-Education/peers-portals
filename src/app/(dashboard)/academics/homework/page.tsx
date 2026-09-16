@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
@@ -111,6 +112,7 @@ export default function HomeworkPage() {
       <AcademicsNav />
 
       <div className="grid gap-3 sm:grid-cols-2">
+        <Field id="homework-class" label="Class">
         <Select
           value={classId || undefined}
           onValueChange={(value) => {
@@ -118,7 +120,7 @@ export default function HomeworkPage() {
             setSectionId("");
           }}
         >
-          <SelectTrigger className="w-full" aria-label="Class">
+          <SelectTrigger id="homework-class" className="w-full">
             <SelectValue placeholder="Select class" />
           </SelectTrigger>
           <SelectContent>
@@ -129,8 +131,10 @@ export default function HomeworkPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
+        <Field id="homework-section" label="Section">
         <Select value={sectionId || undefined} onValueChange={setSectionId} disabled={!classId}>
-          <SelectTrigger className="w-full" aria-label="Section">
+          <SelectTrigger id="homework-section" className="w-full">
             <SelectValue placeholder="Select section" />
           </SelectTrigger>
           <SelectContent>
@@ -141,6 +145,7 @@ export default function HomeworkPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
       </div>
 
       {!sectionId ? (
@@ -198,12 +203,13 @@ export default function HomeworkPage() {
               <DialogTitle>Assign homework</DialogTitle>
               <DialogDescription>Post an assignment with a due date for this section.</DialogDescription>
             </DialogHeader>
+            <Field id="homework-subject" label="Subject">
             <Select
               value={form.subjectId || undefined}
               onValueChange={(value) => setForm((current) => ({ ...current, subjectId: value }))}
             >
-              <SelectTrigger className="w-full" aria-label="Subject">
-                <SelectValue placeholder="Subject" />
+              <SelectTrigger id="homework-subject" className="w-full">
+                <SelectValue placeholder="Select subject" />
               </SelectTrigger>
               <SelectContent>
                 {subjects.map((subject) => (
@@ -213,20 +219,26 @@ export default function HomeworkPage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
             <Input
+              id="homework-title"
+              label="Title"
               required
-              placeholder="Title"
               value={form.title}
               onChange={(event) => setForm((current) => ({ ...current, title: event.target.value }))}
             />
+            <Field id="homework-instructions" label="Instructions">
             <textarea
+              id="homework-instructions"
               required
-              placeholder="Instructions"
               className={`${controlField} h-auto min-h-24 py-3`}
               value={form.description}
               onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))}
             />
+            </Field>
             <Input
+              id="homework-due"
+              label="Due date"
               required
               type="date"
               value={form.dueDate}

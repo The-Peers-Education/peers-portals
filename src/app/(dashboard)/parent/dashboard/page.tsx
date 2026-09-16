@@ -285,6 +285,8 @@ export default function ParentDashboardPage() {
               <DialogDescription>Paste a Drive, Classroom, or photo link for {selected.fullName}.</DialogDescription>
             </DialogHeader>
             <Input
+              id="homework-url"
+              label="Submission link"
               required
               type="url"
               placeholder="https://"

@@ -54,6 +54,38 @@ export function formatDate(value?: string | Date | null) {
   }).format(date);
 }
 
+function parseClockParts(value: string | Date) {
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) return null;
+    return { hours: value.getHours(), minutes: value.getMinutes() };
+  }
+
+  const clock = value.trim().match(/(?:T|^|\s)(\d{1,2}):(\d{2})(?::\d{2})?/);
+  if (clock) {
+    return { hours: Number(clock[1]), minutes: Number(clock[2]) };
+  }
+
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return { hours: date.getHours(), minutes: date.getMinutes() };
+}
+
+export function formatTime(value?: string | Date | null) {
+  if (value === null || value === undefined || value === "") return "—";
+  const parts = parseClockParts(value);
+  if (!parts || !Number.isFinite(parts.hours) || parts.hours < 0 || parts.hours > 23) {
+    return typeof value === "string" ? value : "—";
+  }
+  const suffix = parts.hours >= 12 ? "PM" : "AM";
+  const hour12 = parts.hours % 12 || 12;
+  return `${hour12}:${String(parts.minutes).padStart(2, "0")} ${suffix}`;
+}
+
+export function formatTimeRange(start?: string | Date | null, end?: string | Date | null) {
+  if (!start && !end) return "—";
+  return `${formatTime(start)} – ${formatTime(end)}`;
+}
+
 export function toDateKey(value?: string | Date | null) {
   if (!value) return "";
   if (typeof value === "string") return value.slice(0, 10);
@@ -93,6 +125,10 @@ export function remainingBalance(challan: {
 }) {
   if (challan.remainingBalance !== undefined) return toAmount(challan.remainingBalance);
   return Math.max(0, toAmount(challan.amount) - toAmount(challan.paidAmount));
+}
+
+export function displayUserName(user?: { fullName?: string | null; email?: string | null } | null) {
+  return user?.fullName?.trim() || user?.email?.trim() || "Account";
 }
 
 export const EXPENSE_CATEGORIES = [

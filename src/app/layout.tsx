@@ -40,7 +40,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${manrope.variable} ${inter.variable} ${geistMono.variable} ${inter.className} h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full bg-background font-sans text-foreground">
+      <body
+        className="min-h-full bg-background font-sans text-foreground"
+        suppressHydrationWarning
+      >
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

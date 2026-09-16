@@ -14,10 +14,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi } from "@/lib/api";
+import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
 
@@ -27,6 +29,7 @@ export default function StudentReportCardPage() {
   const router = useRouter();
   const studentId = params.id;
   const examTermId = searchParams.get("examTermId") ?? "";
+  const user = useAuthStore((state) => state.user);
   const branchId = useAuthStore((state) => state.activeBranchId ?? state.user?.branchId);
 
   const examsQuery = useQuery({
@@ -53,14 +56,19 @@ export default function StudentReportCardPage() {
         title="Report card"
         description="Printable term summary with subject marks, percentage, and teacher signature."
         action={
-          <div className="flex flex-wrap gap-2">
+          <div className="no-print flex flex-wrap gap-2">
             <Button variant="outline" asChild>
-              <Link href="/students">
+              <Link href={portalPath(user?.role, "/students")}>
                 <ArrowLeft className="size-5" strokeWidth={1.75} />
                 Students
               </Link>
             </Button>
-            <Button type="button" onClick={() => window.print()} disabled={!reportQuery.data}>
+            <Button
+              type="button"
+              className="no-print"
+              onClick={() => window.print()}
+              disabled={!reportQuery.data}
+            >
               <Printer className="size-5" strokeWidth={1.75} />
               Print
             </Button>
@@ -68,17 +76,18 @@ export default function StudentReportCardPage() {
         }
       />
 
-      <div className="print:hidden max-w-xs">
+      <div className="no-print print:hidden max-w-xs">
+        <Field id="report-exam-term" label="Exam term">
         <Select
           value={examTermId || undefined}
           onValueChange={(value) => {
             const next = new URLSearchParams(searchParams.toString());
             if (value) next.set("examTermId", value);
             else next.delete("examTermId");
-            router.replace(`/students/${studentId}/report-card?${next.toString()}`);
+            router.replace(`${portalPath(user?.role, `/students/${studentId}/report-card`)}?${next.toString()}`);
           }}
         >
-          <SelectTrigger className="w-full bg-white" aria-label="Exam term">
+          <SelectTrigger id="report-exam-term" className="w-full bg-white">
             <SelectValue placeholder="Latest graded term" />
           </SelectTrigger>
           <SelectContent>
@@ -89,12 +98,16 @@ export default function StudentReportCardPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
       </div>
 
       {reportQuery.isLoading ? (
         <TableSkeleton rows={6} cols={5} />
       ) : reportQuery.data ? (
-        <div id="printable-report-card" className="mx-auto max-w-3xl rounded-[10px] border border-cloud bg-white">
+        <div
+          id="printable-report-card"
+          className="printable-area print-break-inside-avoid mx-auto max-w-3xl rounded-[10px] border border-cloud bg-white"
+        >
           <ReportCardSheet report={reportQuery.data} />
         </div>
       ) : (

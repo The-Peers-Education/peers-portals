@@ -30,7 +30,7 @@ export const useAuthStore = create<AuthState>()(
           activeBranchId:
             user.role === "SUPER_ADMIN" ? previousBranch : user.branchId,
         });
-        setAuthCookie();
+        setAuthCookie(user.role);
       },
       setUser: (user) => {
         const previousBranch = get().activeBranchId;
@@ -39,6 +39,7 @@ export const useAuthStore = create<AuthState>()(
           activeBranchId:
             user.role === "SUPER_ADMIN" ? previousBranch : user.branchId,
         });
+        setAuthCookie(user.role);
       },
       setActiveBranchId: (branchId) => set({ activeBranchId: branchId }),
       clearAuth: () => {
@@ -59,7 +60,7 @@ export const useAuthStore = create<AuthState>()(
         const next = error ? useAuthStore.getState() : state;
         next?.setHasHydrated(true);
         if (next?.token) {
-          setAuthCookie();
+          setAuthCookie(next.user?.role);
         } else {
           clearAuthCookie();
         }

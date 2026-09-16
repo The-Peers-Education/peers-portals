@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { LeaveStatusBadge, PayrollStatusBadge } from "@/components/shared/StatusBadge";
@@ -231,9 +232,10 @@ export default function PayrollPage() {
       />
 
       <div className="grid gap-3 sm:grid-cols-2 lg:max-w-md">
+        <Field id="payroll-month" label="Month">
         <Select value={String(month)} onValueChange={(value) => setMonth(Number(value))}>
-          <SelectTrigger className="w-full bg-white" aria-label="Month">
-            <SelectValue placeholder="Month" />
+          <SelectTrigger id="payroll-month" className="w-full bg-white">
+            <SelectValue placeholder="Select month" />
           </SelectTrigger>
           <SelectContent>
             {MONTHS.map((label, index) => (
@@ -243,9 +245,11 @@ export default function PayrollPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
+        <Field id="payroll-year" label="Year">
         <Select value={String(year)} onValueChange={(value) => setYear(Number(value))}>
-          <SelectTrigger className="w-full bg-white" aria-label="Year">
-            <SelectValue placeholder="Year" />
+          <SelectTrigger id="payroll-year" className="w-full bg-white">
+            <SelectValue placeholder="Select year" />
           </SelectTrigger>
           <SelectContent>
             {years.map((item) => (
@@ -255,6 +259,7 @@ export default function PayrollPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
       </div>
 
       <section className="grid gap-3">
@@ -308,7 +313,7 @@ export default function PayrollPage() {
             <DialogDescription>Print or save this salary statement.</DialogDescription>
           </DialogHeader>
           {slip ? (
-            <div id="printable-payslip">
+            <div id="printable-payslip" className="printable-area print-break-inside-avoid">
               <PayslipSheet slip={slip} />
             </div>
           ) : null}
@@ -316,7 +321,7 @@ export default function PayrollPage() {
             <Button type="button" variant="outline" onClick={() => setSlip(null)}>
               Close
             </Button>
-            <Button type="button" onClick={() => window.print()}>
+            <Button type="button" className="no-print" onClick={() => window.print()}>
               <Printer className="size-5" strokeWidth={1.75} />
               Print
             </Button>

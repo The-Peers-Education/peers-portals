@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Building2, CirclePlus, UserCog } from "lucide-react";
 import { toast } from "sonner";
@@ -26,9 +27,11 @@ import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
+import { Field } from "@/components/shared/Field";
 import { PasswordInput } from "@/components/shared/PasswordInput";
 import { authApi, staffApi } from "@/lib/api";
 import { canManageStaff, ROLE_LABELS } from "@/lib/rbac";
+import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { formatDate, getErrorMessage } from "@/lib/utils";
 import type { Role, User } from "@/types";
@@ -76,7 +79,15 @@ export default function StaffPage() {
   });
 
   const columns: DataTableColumn<User>[] = [
-    { key: "email", header: "Email", cell: (row) => <span className="font-medium">{row.email}</span> },
+    {
+      key: "email",
+      header: "Email",
+      cell: (row) => (
+        <Link href={portalPath(user?.role, `/staff/${row.id}`)} className="font-medium hover:underline">
+          {row.email}
+        </Link>
+      ),
+    },
     {
       key: "role",
       header: "Role",
@@ -122,22 +133,28 @@ export default function StaffPage() {
       key: "actions",
       header: "",
       className: "text-right",
-      cell: (row) =>
-        row.id === user?.id || row.role === "SUPER_ADMIN" ? null : (
-          <Button
-            size="sm"
-            variant="outline"
-            disabled={updateMutation.isPending}
-            onClick={() =>
-              updateMutation.mutate({
-                id: row.id,
-                payload: { isActive: row.isActive === false },
-              })
-            }
-          >
-            {row.isActive === false ? "Activate" : "Deactivate"}
+      cell: (row) => (
+        <div className="flex justify-end gap-2">
+          <Button size="sm" variant="outline" asChild>
+            <Link href={portalPath(user?.role, `/staff/${row.id}`)}>Profile</Link>
           </Button>
-        ),
+          {row.id === user?.id || row.role === "SUPER_ADMIN" ? null : (
+            <Button
+              size="sm"
+              variant="outline"
+              disabled={updateMutation.isPending}
+              onClick={() =>
+                updateMutation.mutate({
+                  id: row.id,
+                  payload: { isActive: row.isActive === false },
+                })
+              }
+            >
+              {row.isActive === false ? "Activate" : "Deactivate"}
+            </Button>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -214,18 +231,19 @@ export default function StaffPage() {
             />
             <PasswordInput
               id="staff-password"
-              label="Temporary password"
+              label="Password"
               autoComplete="new-password"
               required
               minLength={8}
               value={form.password}
               onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
             />
+            <Field id="staff-role" label="Role">
             <Select
               value={form.role}
               onValueChange={(value) => setForm((current) => ({ ...current, role: value as Role }))}
             >
-              <SelectTrigger className="w-full" aria-label="Staff role">
+              <SelectTrigger id="staff-role" className="w-full">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -236,6 +254,7 @@ export default function StaffPage() {
                 ))}
               </SelectContent>
             </Select>
+            </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel

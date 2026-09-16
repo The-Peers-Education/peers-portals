@@ -1,12 +1,13 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { BranchSwitcher } from "@/components/layout/BranchSwitcher";
-import { NAV_ITEMS } from "@/lib/nav";
-import { ROLE_LABELS } from "@/lib/rbac";
+import { UserMenu } from "@/components/layout/UserMenu";
+import { headerBreadcrumbs } from "@/lib/breadcrumbs";
+import { portalPath, toAppPathname } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { clickable, focusRing } from "@/lib/styles";
 import { cn } from "@/lib/utils";
@@ -20,12 +21,10 @@ export function Header({
 }) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
-  const current = NAV_ITEMS.find(
-    (item) => pathname === item.href || pathname.startsWith(`${item.href}/`),
-  );
+  const crumbs = headerBreadcrumbs(toAppPathname(pathname), user?.role);
 
   return (
-    <header className="sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-cloud bg-paper/95 px-4 backdrop-blur md:px-6">
+    <header className="no-print sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-cloud bg-paper/95 px-4 backdrop-blur md:px-6">
       <Image
         src="/logo.png"
         alt="The Peers Education System"
@@ -35,23 +34,33 @@ export function Header({
         priority
       />
 
-      <div className="hidden min-w-0 flex-1 lg:block">
-        <p className="truncate font-display text-base font-semibold text-deep-navy">
-          {current?.label ?? "Staff Portal"}
-        </p>
-        <p className="truncate text-sm text-muted-foreground">
-          The Peers Education System
-        </p>
-      </div>
+      <nav aria-label="Breadcrumb" className="hidden min-w-0 flex-1 lg:block">
+        <ol className="flex min-w-0 items-center gap-2 text-sm">
+          {crumbs.map((crumb, index) => (
+            <li key={`${crumb.label}-${index}`} className="flex min-w-0 items-center gap-2">
+              {index > 0 ? (
+                <span className="text-muted-foreground" aria-hidden>
+                  /
+                </span>
+              ) : null}
+              {crumb.href && user?.role ? (
+                <Link
+                  href={portalPath(user.role, crumb.href)}
+                  className={cn("truncate text-muted-foreground hover:text-deep-navy", focusRing)}
+                >
+                  {crumb.label}
+                </Link>
+              ) : (
+                <span className="truncate font-medium text-deep-navy">{crumb.label}</span>
+              )}
+            </li>
+          ))}
+        </ol>
+      </nav>
 
       <div className="flex shrink-0 items-center gap-3">
         <BranchSwitcher placement="header" />
-
-        {user?.role ? (
-          <Badge variant="secondary" className="hidden bg-marigold text-deep-navy lg:inline-flex">
-            {ROLE_LABELS[user.role]}
-          </Badge>
-        ) : null}
+        <UserMenu />
 
         <button
           type="button"

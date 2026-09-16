@@ -27,6 +27,7 @@ export interface Branch {
 export interface User {
   id: string;
   email: string;
+  fullName?: string | null;
   role: Role;
   branchId: string | null;
   isActive?: boolean;
@@ -191,6 +192,12 @@ export interface RegisterStaffInput {
 export interface UpdateStaffInput {
   role?: Role;
   isActive?: boolean;
+}
+
+export interface UpdateStaffProfileInput {
+  fullName?: string | null;
+  email?: string;
+  designation?: string;
 }
 
 export interface AcademicSection {
@@ -502,4 +509,81 @@ export interface AdmissionsLead {
   enrolledStudentId?: string;
   targetClass?: { id: string; name: string; code: string } | null;
   inquiry?: { id: string; type: string; message: string; createdAt: string } | null;
+}
+
+export interface StaffProfile {
+  id: string;
+  email: string;
+  fullName?: string | null;
+  role: Role;
+  branchId: string | null;
+  isActive: boolean;
+  createdAt: string;
+  branch?: Pick<Branch, "id" | "name" | "code"> | null;
+  staffProfile: {
+    designation: string;
+    joinedDate: string;
+    baseSalary: number;
+  } | null;
+  assignedClasses: Array<{
+    id: string;
+    dayOfWeek: DayOfWeek;
+    startTime: string;
+    endTime: string;
+    subject: { id: string; name: string; code: string };
+    section: { id: string; name: string; class: { id: string; name: string; code: string } };
+  }>;
+  payroll: Array<{
+    id: string;
+    month: number;
+    year: number;
+    baseSalary: number;
+    deductions: number;
+    netSalary: number;
+    status: PayrollStatus;
+    paidAt?: string | null;
+  }>;
+}
+
+export interface ChangePasswordInput {
+  currentPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+}
+
+export interface DashboardAnalytics {
+  campusName: string;
+  studentCount: number;
+  collectedThisMonth: number;
+  collectedLastMonth: number;
+  collectedChangePct: number;
+  pendingFees: number;
+  expensesThisMonth: number;
+  expensesLastMonth: number;
+  expensesChangePct: number;
+  monthlyRevenueVsExpenses: Array<{
+    month: string;
+    year: number;
+    collectedFees: number;
+    expenses: number;
+  }>;
+  attendanceOverview: {
+    presentPercentage: number;
+    absentPercentage: number;
+    leavePercentage: number;
+    markedCount: number;
+    studentCount: number;
+  };
+  feeStatusBreakdown: {
+    paidCount: number;
+    partialCount: number;
+    pendingCount: number;
+  };
+  recentActivity: Array<{
+    id: string;
+    type: "PAYMENT" | "EXPENSE";
+    message: string;
+    createdAt: string;
+  }>;
+  canSeeFinance: boolean;
 }

@@ -3,24 +3,19 @@
 import type { CSSProperties, ReactNode } from "react"
 import { useTheme } from "next-themes"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
-import {
-  CircleAlert,
-  CircleCheck,
-  CircleX,
-  Info,
-  LoaderCircle,
-} from "lucide-react"
+import { AlertCircle, Check, Info, LoaderCircle, X } from "lucide-react"
 
-function ToastIcon({
-  className,
+function CircleGlyph({
   children,
+  className,
 }: {
-  className: string
   children: ReactNode
+  className: string
 }) {
   return (
     <span
-      className={`flex size-9 shrink-0 items-center justify-center rounded-full ${className}`}
+      className={`inline-flex size-6 shrink-0 items-center justify-center rounded-full ${className}`}
+      aria-hidden
     >
       {children}
     </span>
@@ -34,32 +29,17 @@ const Toaster = ({ ...props }: ToasterProps) => {
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
+      position="bottom-right"
       icons={{
         success: (
-          <ToastIcon className="bg-leaf/15 text-leaf">
-            <CircleCheck className="size-6" strokeWidth={2.25} />
-          </ToastIcon>
+          <CircleGlyph className="bg-deep-navy text-white">
+            <Check className="size-3.5" strokeWidth={3} />
+          </CircleGlyph>
         ),
-        info: (
-          <ToastIcon className="bg-deep-navy/10 text-deep-navy">
-            <Info className="size-6" strokeWidth={2.25} />
-          </ToastIcon>
-        ),
-        warning: (
-          <ToastIcon className="bg-marigold/20 text-deep-navy">
-            <CircleAlert className="size-6" strokeWidth={2.25} />
-          </ToastIcon>
-        ),
-        error: (
-          <ToastIcon className="bg-red-600/10 text-red-700">
-            <CircleX className="size-6" strokeWidth={2.25} />
-          </ToastIcon>
-        ),
-        loading: (
-          <ToastIcon className="bg-cloud text-deep-navy">
-            <LoaderCircle className="size-6 animate-spin" strokeWidth={2.25} />
-          </ToastIcon>
-        ),
+        info: <Info className="size-6 text-deep-navy" strokeWidth={2} />,
+        warning: <AlertCircle className="size-6 text-deep-navy" strokeWidth={2} />,
+        error: <X className="size-6 text-deep-navy" strokeWidth={2} />,
+        loading: <LoaderCircle className="size-6 animate-spin text-deep-navy" strokeWidth={2} />,
       }}
       style={
         {

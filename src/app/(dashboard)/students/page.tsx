@@ -23,6 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
+import { Field } from "@/components/shared/Field";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { SlideOver } from "@/components/shared/SlideOver";
@@ -30,6 +31,7 @@ import { TableSkeleton } from "@/components/shared/Skeleton";
 import { FeeStatusBadge, StudentStatusBadge } from "@/components/shared/StatusBadge";
 import { studentsApi } from "@/lib/api";
 import { canEnterGrades, canRegisterStudents } from "@/lib/rbac";
+import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { formatDate, formatMonthYear, formatPkr, getErrorMessage } from "@/lib/utils";
 import type { Student, StudentStatus } from "@/types";
@@ -145,7 +147,7 @@ export default function StudentsPage() {
         <div className="flex justify-end gap-2">
           {canViewReport ? (
             <Button size="sm" variant="outline" asChild>
-              <Link href={`/students/${row.id}/report-card`}>
+              <Link href={portalPath(user?.role, `/students/${row.id}/report-card`)}>
                 <FileText className="size-4" strokeWidth={1.75} />
                 Report card
               </Link>
@@ -233,7 +235,7 @@ export default function StudentsPage() {
         }
       />
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
         <div className="relative flex-1">
           <Search
             className="pointer-events-none absolute top-1/2 left-3 z-10 size-5 -translate-y-1/2 text-muted-foreground"
@@ -250,8 +252,9 @@ export default function StudentsPage() {
             onChange={(event) => setSearch(event.target.value)}
           />
         </div>
+        <Field id="student-class-filter" label="Class">
         <Select value={classFilter} onValueChange={setClassFilter}>
-          <SelectTrigger className="w-full bg-white sm:w-52" aria-label="Filter by class">
+          <SelectTrigger id="student-class-filter" className="w-full bg-white sm:w-52">
             <SelectValue placeholder="All classes" />
           </SelectTrigger>
           <SelectContent>
@@ -263,6 +266,7 @@ export default function StudentsPage() {
             ))}
           </SelectContent>
         </Select>
+        </Field>
       </div>
 
       {studentsQuery.isLoading ? (
@@ -375,13 +379,14 @@ export default function StudentsPage() {
                     setEditForm((current) => ({ ...current, guardianPhone: event.target.value }))
                   }
                 />
+                <Field id="edit-status" label="Status">
                 <Select
                   value={editForm.status}
                   onValueChange={(value) =>
                     setEditForm((current) => ({ ...current, status: value as StudentStatus }))
                   }
                 >
-                  <SelectTrigger className="w-full" aria-label="Student status">
+                  <SelectTrigger id="edit-status" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -392,6 +397,7 @@ export default function StudentsPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                </Field>
                 <Button type="submit" disabled={updateMutation.isPending}>
                   {updateMutation.isPending ? "Saving…" : "Save changes"}
                 </Button>

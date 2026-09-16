@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
 
 export default function AcademicsIndexPage() {
-  redirect("/academics/grades");
+  redirect("/academics/classes");
 }

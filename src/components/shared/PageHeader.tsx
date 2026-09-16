@@ -1,4 +1,5 @@
 import type { LucideIcon } from "lucide-react";
+import type { ReactNode } from "react";
 
 export function PageHeader({
   title,
@@ -6,8 +7,8 @@ export function PageHeader({
   action,
 }: {
   title: string;
-  description?: string;
-  action?: React.ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
 }) {
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

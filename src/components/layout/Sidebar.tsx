@@ -11,9 +11,10 @@ import { Button } from "@/components/ui/button";
 import { BranchSwitcher } from "@/components/layout/BranchSwitcher";
 import { NAV_ITEMS } from "@/lib/nav";
 import { ROLE_LABELS } from "@/lib/rbac";
-import { cn } from "@/lib/utils";
+import { cn, displayUserName } from "@/lib/utils";
 import { useAuthStore } from "@/lib/store";
 import { focusRingOnNavy } from "@/lib/styles";
+import { portalPath, toAppPathname } from "@/lib/paths";
 
 export function Sidebar({
   open,
@@ -54,7 +55,7 @@ export function Sidebar({
         aria-label="Close navigation overlay"
         tabIndex={open && !isDesktop ? 0 : -1}
         className={cn(
-          "fixed inset-0 z-40 cursor-pointer bg-deep-navy/40 lg:hidden",
+          "no-print fixed inset-0 z-40 cursor-pointer bg-deep-navy/40 lg:hidden",
           open ? "block" : "hidden",
         )}
         onClick={onClose}
@@ -65,12 +66,12 @@ export function Sidebar({
         aria-hidden={drawerHidden}
         inert={drawerHidden}
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-sidebar text-sidebar-foreground transition-transform lg:static lg:translate-x-0",
+          "no-print fixed inset-y-0 left-0 z-50 flex h-dvh w-72 flex-col bg-sidebar text-sidebar-foreground transition-transform lg:translate-x-0",
           open ? "translate-x-0" : "-translate-x-full",
         )}
       >
-        <div className="h-1.5 bg-marigold" />
-        <div className="flex items-start justify-between gap-3 border-b border-sidebar-border px-4 py-4">
+        <div className="h-1.5 shrink-0 bg-marigold" />
+        <div className="flex shrink-0 items-start justify-between gap-3 border-b border-sidebar-border px-4 py-4">
           <div className="flex min-w-0 flex-col gap-2">
             <div className="rounded-[10px] bg-paper p-2">
               <Image
@@ -83,7 +84,7 @@ export function Sidebar({
               />
             </div>
             <span className="w-fit rounded-full bg-marigold px-2 py-0.5 text-xs font-semibold tracking-wide text-deep-navy">
-              {role === "PARENT" ? "Parent portal" : "Staff portal"}
+              {ROLE_LABELS[role ?? "TEACHER"]}
             </span>
           </div>
           <button
@@ -100,46 +101,53 @@ export function Sidebar({
         </div>
 
         <LayoutGroup>
-          <nav aria-label="Portal pages" className="flex flex-1 flex-col gap-1.5 p-3">
-            {items.map((item) => {
-              const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
-              const Icon = item.icon;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={onClose}
-                  aria-current={active ? "page" : undefined}
-                  className={cn(
-                    "relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] font-medium leading-none transition-colors",
-                    focusRingOnNavy,
-                    active
-                      ? "bg-sidebar-accent text-white"
-                      : "text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
-                  )}
-                >
-                  {active ? (
-                    <motion.span
-                      layoutId="nav-active"
-                      className="absolute inset-y-1 left-0 w-1 rounded-full bg-marigold"
-                      transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                    />
-                  ) : null}
-                  <Icon className="size-6 shrink-0" strokeWidth={1.75} aria-hidden />
-                  {item.label}
-                </Link>
-              );
-            })}
+          <nav
+            aria-label="Portal pages"
+            className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden overscroll-contain p-3 [scrollbar-color:rgba(255,255,255,0.35)_transparent] [scrollbar-width:thin]"
+          >
+            <div className="flex flex-col gap-1.5">
+              {items.map((item) => {
+                const href = portalPath(role, item.path);
+                const appPath = toAppPathname(pathname);
+                const active = appPath === item.path || appPath.startsWith(`${item.path}/`);
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.path}
+                    href={href}
+                    onClick={onClose}
+                    aria-current={active ? "page" : undefined}
+                    className={cn(
+                      "relative flex min-h-11 items-center gap-3 rounded-[10px] px-3 py-2 text-[15px] font-medium leading-none transition-colors",
+                      focusRingOnNavy,
+                      active
+                        ? "bg-sidebar-accent text-white"
+                        : "text-sidebar-foreground hover:bg-sidebar-accent/70 hover:text-sidebar-accent-foreground",
+                    )}
+                  >
+                    {active ? (
+                      <motion.span
+                        layoutId="nav-active"
+                        className="absolute inset-y-1 left-0 w-1 rounded-full bg-marigold"
+                        transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+                      />
+                    ) : null}
+                    <Icon className="size-6 shrink-0" strokeWidth={1.75} aria-hidden />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </div>
           </nav>
         </LayoutGroup>
 
-        <div className="mt-auto flex flex-col gap-3 border-t border-sidebar-border p-4">
+        <div className="flex shrink-0 flex-col gap-3 border-t border-sidebar-border p-4 lg:hidden">
           <BranchSwitcher placement="sidebar" />
           <div className="flex min-w-0 flex-col gap-0.5">
-            <p className="truncate text-[15px] font-medium">{user?.email}</p>
-            <p className="text-sm text-sidebar-foreground">
-              {role ? ROLE_LABELS[role] : "Staff"}
-            </p>
+            <p className="truncate text-[15px] font-medium">{displayUserName(user)}</p>
+            {user?.email && displayUserName(user) !== user.email ? (
+              <p className="truncate text-xs text-white/70">{user.email}</p>
+            ) : null}
           </div>
           <Button
             variant="outline"
@@ -151,6 +159,7 @@ export function Sidebar({
           </Button>
         </div>
       </aside>
+      <div className="hidden w-72 shrink-0 lg:block" aria-hidden />
     </>
   );
 }

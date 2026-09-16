@@ -287,12 +287,12 @@ export default function FeesPage() {
           </DialogHeader>
           <form className="grid gap-3" onSubmit={onSubmit}>
             <div className="grid gap-1.5">
-              <Label>Student</Label>
+              <Label htmlFor="fee-student">Student</Label>
               <Select
                 value={form.studentId || undefined}
                 onValueChange={(value) => setForm((current) => ({ ...current, studentId: value }))}
               >
-                <SelectTrigger className="w-full" aria-label="Select student">
+                <SelectTrigger id="fee-student" className="w-full">
                   <SelectValue placeholder="Select student" />
                 </SelectTrigger>
                 <SelectContent>
@@ -306,12 +306,12 @@ export default function FeesPage() {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="grid gap-1.5">
-                <Label>Month</Label>
+                <Label htmlFor="fee-month">Month</Label>
                 <Select
                   value={form.month}
                   onValueChange={(value) => setForm((current) => ({ ...current, month: value }))}
                 >
-                  <SelectTrigger className="w-full" aria-label="Fee month">
+                  <SelectTrigger id="fee-month" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -324,12 +324,12 @@ export default function FeesPage() {
                 </Select>
               </div>
               <div className="grid gap-1.5">
-                <Label>Year</Label>
+                <Label htmlFor="fee-year">Year</Label>
                 <Select
                   value={form.year}
                   onValueChange={(value) => setForm((current) => ({ ...current, year: value }))}
                 >
-                  <SelectTrigger className="w-full" aria-label="Fee year">
+                  <SelectTrigger id="fee-year" className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -393,14 +393,14 @@ export default function FeesPage() {
               onChange={(event) => setPayment((current) => ({ ...current, amount: event.target.value }))}
             />
             <div className="grid gap-1.5">
-              <Label>Method</Label>
+              <Label htmlFor="pay-method">Method</Label>
               <Select
                 value={payment.method}
                 onValueChange={(value) =>
                   setPayment((current) => ({ ...current, method: value as PaymentMethod }))
                 }
               >
-                <SelectTrigger className="w-full" aria-label="Payment method">
+                <SelectTrigger id="pay-method" className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -439,7 +439,7 @@ export default function FeesPage() {
             <Button type="button" variant="outline" onClick={() => setReceipt(null)}>
               Close
             </Button>
-            <Button type="button" onClick={() => window.print()}>
+            <Button type="button" className="no-print" onClick={() => window.print()}>
               <Printer className="size-5" strokeWidth={1.75} />
               Print
             </Button>
@@ -448,7 +448,7 @@ export default function FeesPage() {
       </Dialog>
 
       {receipt ? (
-        <div id="printable-challan" className="hidden">
+        <div id="printable-challan" className="printable-area hidden">
           <ChallanReceipt challan={receipt} campusName={campusName} />
         </div>
       ) : null}

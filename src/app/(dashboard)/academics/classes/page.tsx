@@ -232,6 +232,7 @@ function ClassCard({
               <Input
                 id={`${schoolClass.id}-section`}
                 placeholder="Section name"
+                aria-label="Section name"
                 className="h-10 min-h-10"
                 value={sectionName}
                 onChange={(event) => setSectionName(event.target.value)}
@@ -262,6 +263,7 @@ function ClassCard({
               <Input
                 id={`${schoolClass.id}-subject-name`}
                 placeholder="Subject"
+                aria-label="Subject name"
                 className="h-10 min-h-10"
                 value={subject.name}
                 onChange={(event) => setSubject((current) => ({ ...current, name: event.target.value }))}
@@ -269,6 +271,7 @@ function ClassCard({
               <Input
                 id={`${schoolClass.id}-subject-code`}
                 placeholder="Code"
+                aria-label="Subject code"
                 className="h-10 min-h-10"
                 value={subject.code}
                 onChange={(event) => setSubject((current) => ({ ...current, code: event.target.value }))}

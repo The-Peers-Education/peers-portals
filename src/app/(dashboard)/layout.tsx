@@ -10,6 +10,7 @@ import { SkipLink } from "@/components/shared/SkipLink";
 import { PageTransition } from "@/components/ui/animations";
 import { authApi, branchesApi } from "@/lib/api";
 import { canAccessRoute, homePath, isStaffRole } from "@/lib/rbac";
+import { matchPortalPrefix, portalBase, portalPath, toAppPathname } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { useHasHydrated } from "@/hooks/use-has-hydrated";
 
@@ -66,6 +67,14 @@ export default function DashboardLayout({
     }
     if (user && !canAccessRoute(pathname, user.role)) {
       router.replace(homePath(user.role));
+      return;
+    }
+    if (user) {
+      const expected = portalBase(user.role);
+      const current = matchPortalPrefix(pathname);
+      if (current && current !== expected) {
+        router.replace(`${portalPath(user.role, toAppPathname(pathname))}${window.location.search}`);
+      }
     }
   }, [hasHydrated, token, user, pathname, router, clearAuth, meQuery.isError]);
 
@@ -78,7 +87,7 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-screen bg-background">
+    <div className="flex min-h-dvh bg-background">
       <SkipLink />
       <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
