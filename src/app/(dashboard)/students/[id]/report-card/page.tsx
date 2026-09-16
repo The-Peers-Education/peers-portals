@@ -19,6 +19,7 @@ import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi } from "@/lib/api";
+import { printDocument } from "@/lib/pdf";
 import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
@@ -54,7 +55,7 @@ export default function StudentReportCardPage() {
     <PageShell>
       <PageHeader
         title="Report card"
-        description="Printable term summary with subject marks, percentage, and teacher signature."
+        description="Downloadable term summary with subject marks, percentage, and teacher signature."
         action={
           <div className="no-print flex flex-wrap gap-2">
             <Button variant="outline" asChild>
@@ -66,11 +67,11 @@ export default function StudentReportCardPage() {
             <Button
               type="button"
               className="no-print"
-              onClick={() => window.print()}
+              onClick={() => printDocument()}
               disabled={!reportQuery.data}
             >
               <Printer className="size-5" strokeWidth={1.75} />
-              Print
+              Download PDF
             </Button>
           </div>
         }

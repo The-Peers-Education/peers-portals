@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import type { AttendanceStatus, FeeStatus, HomeworkSubmissionStatus, LeaveStatus, PayrollStatus, StudentStatus, AdmissionsLeadStatus } from "@/types";
+import type { AttendanceStatus, BookLoanStatus, FeeStatus, HomeworkSubmissionStatus, LeaveStatus, PayrollStatus, StudentStatus, AdmissionsLeadStatus } from "@/types";
 
 const TONE = {
   navy: "border-transparent bg-deep-navy text-white",
@@ -113,6 +113,18 @@ export function HomeworkStatusBadge({ status }: { status: HomeworkSubmissionStat
 
 export function AdmissionsStatusBadge({ status }: { status: AdmissionsLeadStatus }) {
   const item = ADMISSIONS_STATUS[status];
+  if (!item) return null;
+  return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
+}
+
+const LOAN_STATUS: Record<BookLoanStatus, { icon: LucideIcon; label: string; tone: keyof typeof TONE }> = {
+  ISSUED: { icon: Clock, label: "Issued", tone: "cloud" },
+  OVERDUE: { icon: CircleAlert, label: "Overdue", tone: "gold" },
+  RETURNED: { icon: CircleCheck, label: "Returned", tone: "navy" },
+};
+
+export function LoanStatusBadge({ status }: { status: BookLoanStatus }) {
+  const item = LOAN_STATUS[status];
   if (!item) return null;
   return <StatusChip icon={item.icon} label={item.label} tone={item.tone} />;
 }

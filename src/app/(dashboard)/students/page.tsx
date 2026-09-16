@@ -3,7 +3,7 @@
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, CirclePlus, FileText, Pencil, Search } from "lucide-react";
+import { Building2, CirclePlus, Download, FileText, Pencil, Search, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -30,11 +30,12 @@ import { SlideOver } from "@/components/shared/SlideOver";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { FeeStatusBadge, StudentStatusBadge } from "@/components/shared/StatusBadge";
 import { studentsApi } from "@/lib/api";
+import { csvValue, downloadCsv, parseCsv, STUDENT_IMPORT_TEMPLATE } from "@/lib/csv";
 import { canEnterGrades, canRegisterStudents } from "@/lib/rbac";
 import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { formatDate, formatMonthYear, formatPkr, getErrorMessage } from "@/lib/utils";
-import type { Student, StudentStatus } from "@/types";
+import type { BulkStudentImportInput, Student, StudentStatus } from "@/types";
 
 const STUDENT_STATUSES: StudentStatus[] = [
   "ACTIVE",
@@ -54,6 +55,9 @@ export default function StudentsPage() {
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [importRows, setImportRows] = useState<BulkStudentImportInput[]>([]);
+  const [importFileName, setImportFileName] = useState("");
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [form, setForm] = useState({
     fullName: "",
@@ -112,6 +116,27 @@ export default function StudentsPage() {
     onError: (error) => toast.error(getErrorMessage(error, "Unable to withdraw student")),
   });
 
+  const exportMutation = useMutation({
+    mutationFn: studentsApi.exportCsv,
+    onSuccess: (payload) => {
+      downloadCsv(payload.csv, payload.filename);
+      toast.success("Student roster downloaded");
+    },
+    onError: (error) => toast.error(getErrorMessage(error, "Unable to export students")),
+  });
+
+  const importMutation = useMutation({
+    mutationFn: studentsApi.bulkImport,
+    onSuccess: async (result) => {
+      toast.success(`Imported ${result.created} student${result.created === 1 ? "" : "s"}`);
+      setImportOpen(false);
+      setImportRows([]);
+      setImportFileName("");
+      await queryClient.invalidateQueries({ queryKey: ["students", branchId] });
+    },
+    onError: (error) => toast.error(getErrorMessage(error, "Unable to import students")),
+  });
+
   const classSections = useMemo(() => {
     const values = new Set((studentsQuery.data ?? []).map((student) => student.classSection));
     return Array.from(values).sort();
@@ -130,7 +155,11 @@ export default function StudentsPage() {
   }, [studentsQuery.data, classFilter, search]);
 
   const columns: DataTableColumn<Student>[] = [
-    { key: "name", header: "Student", cell: (row) => <span className="font-medium">{row.fullName}</span> },
+    { key: "name", header: "Student", cell: (row) => (
+      <Link href={portalPath(user?.role, `/students/${row.id}`)} className="font-medium text-deep-navy">
+        {row.fullName}
+      </Link>
+    ) },
     { key: "roll", header: "Roll No", cell: (row) => row.rollNumber },
     { key: "class", header: "Class / Section", cell: (row) => row.classSection },
     { key: "phone", header: "Guardian Phone", cell: (row) => row.guardianPhone || "—" },
@@ -198,6 +227,23 @@ export default function StudentsPage() {
     });
   }
 
+  function onImportFile(file?: File) {
+    if (!file) return;
+    void file.text().then((text) => {
+      const rows = parseCsv(text)
+        .map((row) => ({
+          fullName: csvValue(row, "fullName", "name"),
+          guardianPhone: csvValue(row, "guardianPhone", "phone") || undefined,
+          gender: csvValue(row, "gender") || undefined,
+          classSection: csvValue(row, "classSection", "class"),
+          rollNumber: csvValue(row, "rollNumber", "roll") || undefined,
+        }))
+        .filter((row) => row.fullName && row.classSection);
+      setImportFileName(file.name);
+      setImportRows(rows);
+    });
+  }
+
   const profile = profileQuery.data;
 
   useEffect(() => {
@@ -226,12 +272,29 @@ export default function StudentsPage() {
         title="Students"
         description="Directory of enrolled students for the active branch."
         action={
-          canEdit ? (
-            <Button onClick={() => setOpen(true)}>
-              <CirclePlus className="size-5" strokeWidth={1.75} />
-              Register student
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => exportMutation.mutate()}
+              disabled={exportMutation.isPending}
+            >
+              <Download className="size-5" strokeWidth={1.75} />
+              Export CSV
             </Button>
-          ) : null
+            {canEdit ? (
+              <>
+                <Button type="button" variant="outline" onClick={() => setImportOpen(true)}>
+                  <Upload className="size-5" strokeWidth={1.75} />
+                  Import CSV
+                </Button>
+                <Button onClick={() => setOpen(true)}>
+                  <CirclePlus className="size-5" strokeWidth={1.75} />
+                  Register student
+                </Button>
+              </>
+            ) : null}
+          </div>
         }
       />
 
@@ -323,6 +386,57 @@ export default function StudentsPage() {
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={importOpen}
+        onOpenChange={(next) => {
+          setImportOpen(next);
+          if (!next) {
+            setImportRows([]);
+            setImportFileName("");
+          }
+        }}
+      >
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Import students</DialogTitle>
+            <DialogDescription>
+              Upload a CSV with fullName, guardianPhone, gender, and classSection.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-3">
+            <Input
+              id="student-csv"
+              type="file"
+              accept=".csv,text/csv"
+              onChange={(event) => onImportFile(event.target.files?.[0])}
+            />
+            {importFileName ? (
+              <p className="text-sm text-muted-foreground">
+                {importFileName}: {importRows.length} student{importRows.length === 1 ? "" : "s"} ready
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground">Use the sample template if you need the column layout.</p>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => downloadCsv(STUDENT_IMPORT_TEMPLATE, "student-import-template.csv")}
+            >
+              Sample CSV
+            </Button>
+            <Button
+              type="button"
+              disabled={importRows.length === 0 || importMutation.isPending}
+              onClick={() => importMutation.mutate(importRows)}
+            >
+              {importMutation.isPending ? "Importing…" : "Import"}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 

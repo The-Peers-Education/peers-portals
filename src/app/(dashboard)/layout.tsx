@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { CommandPaletteProvider } from "@/components/layout/CommandPalette";
 import { Header } from "@/components/layout/Header";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
@@ -87,18 +88,20 @@ export default function DashboardLayout({
   }
 
   return (
-    <div className="flex min-h-dvh bg-background">
-      <SkipLink />
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Header
-          menuOpen={sidebarOpen}
-          onMenuClick={() => setSidebarOpen((current) => !current)}
-        />
-        <main id="main-content" tabIndex={-1} className="flex-1 scroll-mt-4 p-4 outline-none md:p-8">
-          <PageTransition routeKey={pathname}>{children}</PageTransition>
-        </main>
+    <CommandPaletteProvider>
+      <div className="flex min-h-dvh bg-background">
+        <SkipLink />
+        <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Header
+            menuOpen={sidebarOpen}
+            onMenuClick={() => setSidebarOpen((current) => !current)}
+          />
+          <main id="main-content" tabIndex={-1} className="flex-1 scroll-mt-4 p-4 outline-none md:p-8">
+            <PageTransition routeKey={pathname}>{children}</PageTransition>
+          </main>
+        </div>
       </div>
-    </div>
+    </CommandPaletteProvider>
   );
 }

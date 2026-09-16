@@ -7,7 +7,12 @@ import type {
   Branch,
   CreateExpenseInput,
   CreateFeeChallanInput,
+  BulkStaffImportInput,
+  BulkStaffImportResult,
+  BulkStudentImportInput,
+  BulkStudentImportResult,
   CreateStudentInput,
+  CsvExportPayload,
   Expense,
   FeeChallan,
   FeeReport,
@@ -48,6 +53,9 @@ import type {
   StaffProfile,
   ChangePasswordInput,
   DashboardAnalytics,
+  BookLoan,
+  BookLoanStatus,
+  LibraryBook,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
@@ -125,7 +133,7 @@ export const branchesApi = {
 };
 
 export const studentsApi = {
-  list: (params?: { classSection?: string; status?: StudentStatus }) =>
+  list: (params?: { classSection?: string; status?: StudentStatus; search?: string }) =>
     api.get<ApiResponse<Student[]>>("/students", { params }).then(unwrap),
   getById: (id: string) => api.get<ApiResponse<StudentProfile>>(`/students/${id}`).then(unwrap),
   create: (payload: CreateStudentInput) =>
@@ -133,6 +141,9 @@ export const studentsApi = {
   update: (id: string, payload: UpdateStudentInput) =>
     api.patch<ApiResponse<Student>>(`/students/${id}`, payload).then(unwrap),
   remove: (id: string) => api.delete<ApiResponse<Student>>(`/students/${id}`).then(unwrap),
+  bulkImport: (records: BulkStudentImportInput[]) =>
+    api.post<ApiResponse<BulkStudentImportResult>>("/students/bulk-import", records).then(unwrap),
+  exportCsv: () => api.get<ApiResponse<CsvExportPayload>>("/students/export").then(unwrap),
 };
 
 export const staffApi = {
@@ -145,6 +156,8 @@ export const staffApi = {
     api
       .patch<ApiResponse<StaffProfile>>(id === "me" ? "/staff/me" : `/staff/${id}/profile`, payload)
       .then(unwrap),
+  bulkImport: (records: BulkStaffImportInput[]) =>
+    api.post<ApiResponse<BulkStaffImportResult>>("/staff/bulk-import", records).then(unwrap),
 };
 
 export const feesApi = {
@@ -164,6 +177,7 @@ export const feesApi = {
     api.post<ApiResponse<FeeChallan>>(`/fees/challans/${id}/payments`, payload).then(unwrap),
   reports: (params?: { month?: number; year?: number }) =>
     api.get<ApiResponse<FeeReport>>("/fees/reports", { params }).then(unwrap),
+  exportCsv: () => api.get<ApiResponse<CsvExportPayload>>("/fees/export").then(unwrap),
 };
 
 export const attendanceApi = {
@@ -274,4 +288,26 @@ export const admissionsApi = {
 
 export const dashboardApi = {
   analytics: () => api.get<ApiResponse<DashboardAnalytics>>("/dashboard/analytics").then(unwrap),
+};
+
+export const libraryApi = {
+  listBooks: (q?: string) =>
+    api.get<ApiResponse<LibraryBook[]>>("/library/books", { params: q ? { q } : undefined }).then(unwrap),
+  upsertBook: (payload: {
+    isbn: string;
+    title: string;
+    author: string;
+    category: string;
+    totalCopies: number;
+  }) => api.post<ApiResponse<LibraryBook>>("/library/books", payload).then(unwrap),
+  listLoans: (status?: BookLoanStatus) =>
+    api
+      .get<ApiResponse<BookLoan[]>>("/library/loans", { params: status ? { status } : undefined })
+      .then(unwrap),
+  issue: (payload: { bookId: string; studentId: string; dueDate: string }) =>
+    api.post<ApiResponse<BookLoan>>("/library/loans/issue", payload).then(unwrap),
+  returnLoan: (id: string) =>
+    api.post<ApiResponse<BookLoan & { overdueDays: number; fineAmount: number }>>(
+      `/library/loans/${id}/return`,
+    ).then(unwrap),
 };

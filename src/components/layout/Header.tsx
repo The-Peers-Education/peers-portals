@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { Menu, Search, X } from "lucide-react";
 import { BranchSwitcher } from "@/components/layout/BranchSwitcher";
+import { useCommandPalette } from "@/components/layout/CommandPalette";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { headerBreadcrumbs } from "@/lib/breadcrumbs";
 import { portalPath, toAppPathname } from "@/lib/paths";
@@ -21,7 +23,14 @@ export function Header({
 }) {
   const pathname = usePathname();
   const user = useAuthStore((state) => state.user);
+  const { openPalette } = useCommandPalette();
   const crumbs = headerBreadcrumbs(toAppPathname(pathname), user?.role);
+  const [shortcut, setShortcut] = useState("Ctrl + K");
+
+  useEffect(() => {
+    const mac = /Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent);
+    setShortcut(mac ? "⌘K" : "Ctrl + K");
+  }, []);
 
   return (
     <header className="no-print sticky top-0 z-30 flex min-h-16 items-center justify-between gap-3 border-b border-cloud bg-paper/95 px-4 backdrop-blur md:px-6">
@@ -60,6 +69,20 @@ export function Header({
 
       <div className="flex shrink-0 items-center gap-3">
         <BranchSwitcher placement="header" />
+        <button
+          type="button"
+          onClick={openPalette}
+          aria-label="Open command palette"
+          aria-keyshortcuts="Control+K Meta+K"
+          className={cn(
+            "inline-flex h-11 items-center gap-2 rounded-[10px] border border-deep-navy/15 bg-white px-3 text-sm text-muted-foreground",
+            clickable,
+            focusRing,
+          )}
+        >
+          <Search size={20} strokeWidth={1.75} aria-hidden />
+          <kbd className="hidden font-sans text-xs text-muted-foreground sm:inline">{shortcut}</kbd>
+        </button>
         <UserMenu />
 
         <button

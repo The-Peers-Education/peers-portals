@@ -90,6 +90,10 @@ export function canManageAdmissions(role?: Role | null) {
   return role === "SUPER_ADMIN" || role === "BRANCH_ADMIN";
 }
 
+export function canManageLibrary(role?: Role | null) {
+  return canManageAdmissions(role);
+}
+
 export function homePath(role?: Role | null) {
   return portalPath(role, "/dashboard");
 }

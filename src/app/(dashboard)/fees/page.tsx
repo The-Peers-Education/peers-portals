@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Banknote, Building2, CirclePlus, Printer, Receipt } from "lucide-react";
+import { Banknote, Building2, CirclePlus, Download, Printer, Receipt } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,6 +31,8 @@ import { TableSkeleton } from "@/components/shared/Skeleton";
 import { StatCard } from "@/components/shared/StatCard";
 import { FeeStatusBadge } from "@/components/shared/StatusBadge";
 import { feesApi, studentsApi, branchesApi } from "@/lib/api";
+import { downloadCsv } from "@/lib/csv";
+import { printDocument } from "@/lib/pdf";
 import { useAuthStore } from "@/lib/store";
 import {
   formatDate,
@@ -114,6 +116,15 @@ export default function FeesPage() {
       await queryClient.invalidateQueries({ queryKey: ["fee-reports", branchId] });
     },
     onError: (error) => toast.error(getErrorMessage(error, "Unable to record payment")),
+  });
+
+  const exportMutation = useMutation({
+    mutationFn: feesApi.exportCsv,
+    onSuccess: (payload) => {
+      downloadCsv(payload.csv, payload.filename);
+      toast.success("Collection ledger downloaded");
+    },
+    onError: (error) => toast.error(getErrorMessage(error, "Unable to export fee ledger")),
   });
 
   const columns: DataTableColumn<FeeChallan>[] = [
@@ -231,10 +242,21 @@ export default function FeesPage() {
         title="Fee Management"
         description="Issue challans, record partial collections, and print receipts."
         action={
-          <Button onClick={() => setOpen(true)}>
-            <CirclePlus className="size-5" strokeWidth={1.75} />
-            Issue challan
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => exportMutation.mutate()}
+              disabled={exportMutation.isPending}
+            >
+              <Download className="size-5" strokeWidth={1.75} />
+              Export Collection Ledger CSV
+            </Button>
+            <Button onClick={() => setOpen(true)}>
+              <CirclePlus className="size-5" strokeWidth={1.75} />
+              Issue challan
+            </Button>
+          </div>
         }
       />
 
@@ -432,16 +454,16 @@ export default function FeesPage() {
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>Challan receipt</DialogTitle>
-            <DialogDescription>Print or save this challan for the student record.</DialogDescription>
+            <DialogDescription>Download this challan as a PDF from the print dialog.</DialogDescription>
           </DialogHeader>
           {receipt ? <ChallanReceipt challan={receipt} campusName={campusName} /> : null}
           <DialogFooter>
             <Button type="button" variant="outline" onClick={() => setReceipt(null)}>
               Close
             </Button>
-            <Button type="button" className="no-print" onClick={() => window.print()}>
+            <Button type="button" className="no-print" onClick={() => printDocument()}>
               <Printer className="size-5" strokeWidth={1.75} />
-              Print
+              Download PDF
             </Button>
           </DialogFooter>
         </DialogContent>

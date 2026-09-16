@@ -149,6 +149,40 @@ export interface CreateStudentInput {
   status?: StudentStatus;
 }
 
+export interface BulkStudentImportInput {
+  fullName: string;
+  classSection: string;
+  guardianPhone?: string;
+  gender?: string;
+  rollNumber?: string;
+}
+
+export interface BulkStudentImportResult {
+  created: number;
+  skipped: number;
+  students: Student[];
+}
+
+export interface BulkStaffImportInput {
+  email: string;
+  fullName?: string;
+  role?: Role;
+  designation?: string;
+  password?: string;
+}
+
+export interface BulkStaffImportResult {
+  created: number;
+  skipped: number;
+  staff: User[];
+}
+
+export interface CsvExportPayload {
+  csv: string;
+  filename: string;
+  rowCount?: number;
+}
+
 export interface UpdateStudentInput {
   fullName?: string;
   classSection?: string;
@@ -586,4 +620,32 @@ export interface DashboardAnalytics {
     createdAt: string;
   }>;
   canSeeFinance: boolean;
+}
+
+export type BookLoanStatus = "ISSUED" | "RETURNED" | "OVERDUE";
+
+export interface LibraryBook {
+  id: string;
+  isbn: string;
+  title: string;
+  author: string;
+  category: string;
+  totalCopies: number;
+  availableCopies: number;
+  activeLoans?: number;
+  createdAt?: string;
+}
+
+export interface BookLoan {
+  id: string;
+  bookId: string;
+  studentId: string;
+  issuedDate: string;
+  dueDate: string;
+  returnedDate?: string | null;
+  fineAmount: string | number;
+  status: BookLoanStatus;
+  overdueDays?: number;
+  book?: Pick<LibraryBook, "id" | "isbn" | "title" | "author">;
+  student?: Pick<Student, "id" | "fullName" | "rollNumber" | "classSection">;
 }
