@@ -4,7 +4,6 @@ import * as React from "react"
 import { cn } from "cn"
 import { Select as SelectPrimitive } from "radix-ui"
 import { ChevronDownIcon, CheckIcon, ChevronUpIcon } from "lucide-react"
-import { focusField } from "@/lib/styles"
 
 function Select({
   ...props
@@ -44,8 +43,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-fit cursor-pointer items-center justify-between gap-2 rounded-[10px] border border-deep-navy/15 bg-white py-2 pr-3 pl-4 text-[15px] whitespace-nowrap transition-[border-color,background-color] duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] select-none data-[state=open]:!border-deep-navy disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:!border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-12 data-[size=default]:min-h-12 data-[size=sm]:h-11 data-[size=sm]:min-h-11 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
-        focusField,
+        "flex w-fit cursor-pointer items-center justify-between gap-2 rounded-[10px] border border-deep-navy/15 bg-white py-2 pr-3 pl-4 text-[15px] whitespace-nowrap outline-none ring-0 shadow-none select-none focus:border-deep-navy/15 focus:ring-0 focus:shadow-none focus-visible:border-deep-navy/15 focus-visible:ring-0 data-[state=open]:border-deep-navy/15 disabled:cursor-not-allowed disabled:opacity-50 aria-invalid:!border-destructive data-placeholder:text-muted-foreground data-[size=default]:h-12 data-[size=default]:min-h-12 data-[size=sm]:h-11 data-[size=sm]:min-h-11 *:data-[slot=select-value]:line-clamp-1 *:data-[slot=select-value]:flex *:data-[slot=select-value]:items-center *:data-[slot=select-value]:gap-1.5 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

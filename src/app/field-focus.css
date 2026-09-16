@@ -1,9 +1,13 @@
 [data-slot="input"]:focus,
-[data-slot="input"]:focus-visible,
+[data-slot="input"]:focus-visible {
+  border-color: #1b3a5c !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
 [data-slot="select-trigger"]:focus,
 [data-slot="select-trigger"]:focus-visible,
 [data-slot="select-trigger"][data-state="open"] {
-  border-color: #1b3a5c !important;
   box-shadow: none !important;
   outline: none !important;
 }

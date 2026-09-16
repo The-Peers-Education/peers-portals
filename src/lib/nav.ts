@@ -1,6 +1,7 @@
 import {
   Banknote,
   CalendarCheck,
+  GraduationCap,
   LayoutGrid,
   UserCog,
   Users,
@@ -41,6 +42,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Attendance",
     icon: CalendarCheck,
     roles: ROUTE_ROLES["/attendance"],
+  },
+  {
+    href: "/academics",
+    label: "Academics",
+    icon: GraduationCap,
+    roles: ROUTE_ROLES["/academics"],
   },
   {
     href: "/fees",

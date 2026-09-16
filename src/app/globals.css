@@ -175,10 +175,13 @@
     visibility: hidden !important;
   }
   #printable-challan,
-  #printable-challan * {
+  #printable-challan *,
+  #printable-report-card,
+  #printable-report-card * {
     visibility: visible !important;
   }
-  #printable-challan {
+  #printable-challan,
+  #printable-report-card {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;

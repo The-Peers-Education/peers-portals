@@ -1,8 +1,9 @@
 "use client";
 
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Building2, CirclePlus, Pencil, Search } from "lucide-react";
+import { Building2, CirclePlus, FileText, Pencil, Search } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -28,7 +29,7 @@ import { SlideOver } from "@/components/shared/SlideOver";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { FeeStatusBadge, StudentStatusBadge } from "@/components/shared/StatusBadge";
 import { studentsApi } from "@/lib/api";
-import { canRegisterStudents } from "@/lib/rbac";
+import { canEnterGrades, canRegisterStudents } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { formatDate, formatMonthYear, formatPkr, getErrorMessage } from "@/lib/utils";
 import type { Student, StudentStatus } from "@/types";
@@ -46,6 +47,7 @@ export default function StudentsPage() {
   const user = useAuthStore((state) => state.user);
   const branchId = useAuthStore((state) => state.activeBranchId ?? state.user?.branchId);
   const canEdit = canRegisterStudents(user?.role);
+  const canViewReport = canEnterGrades(user?.role);
 
   const [search, setSearch] = useState("");
   const [classFilter, setClassFilter] = useState("all");
@@ -140,22 +142,32 @@ export default function StudentsPage() {
       header: "",
       className: "text-right",
       cell: (row) => (
-        <Button
-          size="sm"
-          variant="outline"
-          onClick={() => {
-            setSelectedId(row.id);
-            setEditForm({
-              fullName: row.fullName,
-              classSection: row.classSection,
-              guardianPhone: row.guardianPhone ?? "",
-              status: row.status,
-            });
-          }}
-        >
-          <Pencil className="size-4" strokeWidth={1.75} />
-          {canEdit ? "Edit" : "View"}
-        </Button>
+        <div className="flex justify-end gap-2">
+          {canViewReport ? (
+            <Button size="sm" variant="outline" asChild>
+              <Link href={`/students/${row.id}/report-card`}>
+                <FileText className="size-4" strokeWidth={1.75} />
+                Report card
+              </Link>
+            </Button>
+          ) : null}
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              setSelectedId(row.id);
+              setEditForm({
+                fullName: row.fullName,
+                classSection: row.classSection,
+                guardianPhone: row.guardianPhone ?? "",
+                status: row.status,
+              });
+            }}
+          >
+            <Pencil className="size-4" strokeWidth={1.75} />
+            {canEdit ? "Edit" : "View"}
+          </Button>
+        </div>
       ),
     },
   ];

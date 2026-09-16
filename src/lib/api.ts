@@ -21,6 +21,14 @@ import type {
   UpdateStaffInput,
   UpdateStudentInput,
   User,
+  AcademicClass,
+  AcademicSubject,
+  CreateClassInput,
+  CreateExamTermInput,
+  ExamTerm,
+  GradeBatchInput,
+  Gradebook,
+  ReportCard,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
 
@@ -142,4 +150,39 @@ export const expensesApi = {
   list: () => api.get<ApiResponse<Expense[]>>("/expenses").then(unwrap),
   create: (payload: CreateExpenseInput) =>
     api.post<ApiResponse<Expense>>("/expenses", payload).then(unwrap),
+};
+
+export const academicsApi = {
+  listClasses: () => api.get<ApiResponse<AcademicClass[]>>("/academics/classes").then(unwrap),
+  createClass: (payload: CreateClassInput) =>
+    api.post<ApiResponse<AcademicClass>>("/academics/classes", payload).then(unwrap),
+  addSection: (classId: string, payload: { name: string; capacity?: number }) =>
+    api.post<ApiResponse<{ id: string; name: string; capacity: number }>>(
+      `/academics/classes/${classId}/sections`,
+      payload,
+    ).then(unwrap),
+  listSubjects: (classId?: string) =>
+    api
+      .get<ApiResponse<AcademicSubject[]>>("/academics/subjects", {
+        params: classId ? { classId } : undefined,
+      })
+      .then(unwrap),
+  addSubject: (classId: string, payload: { name: string; code: string }) =>
+    api.post<ApiResponse<{ id: string; name: string; code: string }>>("/academics/subjects", {
+      classId,
+      ...payload,
+    }).then(unwrap),
+  listExams: () => api.get<ApiResponse<ExamTerm[]>>("/academics/exams").then(unwrap),
+  createExam: (payload: CreateExamTermInput) =>
+    api.post<ApiResponse<ExamTerm>>("/academics/exams", payload).then(unwrap),
+  gradebook: (params: { subjectId: string; examTermId: string; sectionId?: string }) =>
+    api.get<ApiResponse<Gradebook>>("/academics/grades", { params }).then(unwrap),
+  saveGrades: (payload: GradeBatchInput) =>
+    api.post<ApiResponse<unknown>>("/academics/grades/batch", payload).then(unwrap),
+  reportCard: (studentId: string, examTermId?: string) =>
+    api
+      .get<ApiResponse<ReportCard>>(`/academics/students/${studentId}/report-card`, {
+        params: examTermId ? { examTermId } : undefined,
+      })
+      .then(unwrap),
 };

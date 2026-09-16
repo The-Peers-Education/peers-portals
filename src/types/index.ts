@@ -192,3 +192,109 @@ export interface UpdateStaffInput {
   role?: Role;
   isActive?: boolean;
 }
+
+export interface AcademicSection {
+  id: string;
+  name: string;
+  capacity: number;
+  classId: string;
+}
+
+export interface AcademicSubject {
+  id: string;
+  name: string;
+  code: string;
+  classId: string;
+}
+
+export interface AcademicClass {
+  id: string;
+  name: string;
+  code: string;
+  branchId: string;
+  createdAt: string;
+  sections: AcademicSection[];
+  subjects: AcademicSubject[];
+}
+
+export interface ExamTerm {
+  id: string;
+  name: string;
+  title?: string;
+  startDate: string;
+  endDate: string;
+  branchId: string;
+  createdAt: string;
+}
+
+export interface GradebookRow {
+  studentId: string;
+  fullName: string;
+  rollNumber: string;
+  classSection: string;
+  marksObtained: number | null;
+  totalMarks: number;
+  remarks: string;
+  percentage: number | null;
+  letter: string | null;
+  gpa: number | null;
+}
+
+export interface Gradebook {
+  examTerm: ExamTerm;
+  subject: AcademicSubject & { className: string };
+  rows: GradebookRow[];
+}
+
+export interface ReportCardSubject {
+  subjectId: string;
+  name: string;
+  code: string;
+  marksObtained: number;
+  totalMarks: number;
+  remarks?: string | null;
+  percentage: number;
+  letter: string;
+  gpa: number;
+}
+
+export interface ReportCard {
+  student: Pick<Student, "id" | "fullName" | "rollNumber" | "classSection" | "status">;
+  campus: Pick<Branch, "id" | "name" | "code">;
+  examTerm: ExamTerm;
+  subjects: ReportCardSubject[];
+  obtainedTotal: number;
+  totalMarks: number;
+  cumulativePercentage: number;
+  letter: string;
+  gpa: number;
+  termStatus: "UPCOMING" | "IN_PROGRESS" | "COMPLETED";
+  resultStatus: "PASS" | "FAIL";
+  rank: number | null;
+  cohortSize: number;
+}
+
+export interface CreateClassInput {
+  name: string;
+  code: string;
+  sections?: Array<{ name: string; capacity?: number }>;
+  subjects?: Array<{ name: string; code: string }>;
+}
+
+export interface CreateExamTermInput {
+  name?: string;
+  title?: string;
+  startDate: string;
+  endDate: string;
+}
+
+export interface GradeBatchInput {
+  subjectId: string;
+  examTermId: string;
+  entries: Array<{
+    studentId: string;
+    marksObtained: number;
+    totalMarks: number;
+    remarks?: string;
+  }>;
+}
