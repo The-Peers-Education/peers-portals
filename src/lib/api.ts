@@ -28,7 +28,9 @@ import type {
   UpdateStudentInput,
   User,
   AcademicClass,
+  AcademicSection,
   AcademicSubject,
+  SubjectAssignment,
   CreateClassInput,
   CreateExamTermInput,
   ExamTerm,
@@ -51,6 +53,7 @@ import type {
   AdmissionsLead,
   AdmissionsLeadStatus,
   StaffProfile,
+  StudentFullProfile,
   ChangePasswordInput,
   DashboardAnalytics,
   BookLoan,
@@ -136,6 +139,8 @@ export const studentsApi = {
   list: (params?: { classSection?: string; status?: StudentStatus; search?: string }) =>
     api.get<ApiResponse<Student[]>>("/students", { params }).then(unwrap),
   getById: (id: string) => api.get<ApiResponse<StudentProfile>>(`/students/${id}`).then(unwrap),
+  fullProfile: (id: string) =>
+    api.get<ApiResponse<StudentFullProfile>>(`/students/${id}/full-profile`).then(unwrap),
   create: (payload: CreateStudentInput) =>
     api.post<ApiResponse<Student>>("/students", payload).then(unwrap),
   update: (id: string, payload: UpdateStudentInput) =>
@@ -150,6 +155,8 @@ export const staffApi = {
   list: () => api.get<ApiResponse<User[]>>("/staff").then(unwrap),
   me: () => api.get<ApiResponse<StaffProfile>>("/staff/me").then(unwrap),
   getById: (id: string) => api.get<ApiResponse<StaffProfile>>(`/staff/${id}`).then(unwrap),
+  fullProfile: (id: string) =>
+    api.get<ApiResponse<StaffProfile>>(`/staff/${id}/full-profile`).then(unwrap),
   update: (id: string, payload: UpdateStaffInput) =>
     api.patch<ApiResponse<User>>(`/staff/${id}/role`, payload).then(unwrap),
   updateProfile: (id: string, payload: UpdateStaffProfileInput) =>
@@ -197,8 +204,8 @@ export const academicsApi = {
   listClasses: () => api.get<ApiResponse<AcademicClass[]>>("/academics/classes").then(unwrap),
   createClass: (payload: CreateClassInput) =>
     api.post<ApiResponse<AcademicClass>>("/academics/classes", payload).then(unwrap),
-  addSection: (classId: string, payload: { name: string; capacity?: number }) =>
-    api.post<ApiResponse<{ id: string; name: string; capacity: number }>>(
+  addSection: (classId: string, payload: { name: string; capacity?: number; roomNumber?: string }) =>
+    api.post<ApiResponse<{ id: string; name: string; capacity: number; roomNumber?: string | null }>>(
       `/academics/classes/${classId}/sections`,
       payload,
     ).then(unwrap),
@@ -225,6 +232,27 @@ export const academicsApi = {
       .get<ApiResponse<ReportCard>>(`/academics/students/${studentId}/report-card`, {
         params: examTermId ? { examTermId } : undefined,
       })
+      .then(unwrap),
+  myClasses: () => api.get<ApiResponse<AcademicSection[]>>("/academics/my-classes").then(unwrap),
+  assignClassTeacher: (sectionId: string, teacherId: string | null) =>
+    api
+      .post<ApiResponse<AcademicSection>>(`/academics/sections/${sectionId}/assign-teacher`, { teacherId })
+      .then(unwrap),
+  assignSubjectTeacher: (payload: { sectionId: string; subjectId: string; teacherId: string }) =>
+    api.post<ApiResponse<SubjectAssignment>>("/academics/sections/subject-teacher", payload).then(unwrap),
+  sectionRoster: (sectionId: string) =>
+    api
+      .get<ApiResponse<{ section: AcademicSection & { enrolled: number }; students: Student[] }>>(
+        `/academics/sections/${sectionId}/roster`,
+      )
+      .then(unwrap),
+  unassignedStudents: () => api.get<ApiResponse<Student[]>>("/academics/unassigned-students").then(unwrap),
+  enrollStudents: (sectionId: string, studentIds: string[]) =>
+    api
+      .post<ApiResponse<{ section: AcademicSection & { enrolled: number }; students: Student[] }>>(
+        `/academics/sections/${sectionId}/enroll`,
+        { studentIds },
+      )
       .then(unwrap),
 };
 

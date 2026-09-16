@@ -20,10 +20,11 @@ export default function StaffMemberPage() {
   const id = params.id;
   const user = useAuthStore((state) => state.user);
   const isSelf = Boolean(user?.id && user.id === id);
+  const useFull = canManageStaff(user?.role);
 
   const profileQuery = useQuery({
-    queryKey: ["staff-profile", id],
-    queryFn: () => staffApi.getById(id),
+    queryKey: ["staff-profile", id, useFull ? "full" : "basic"],
+    queryFn: () => (useFull ? staffApi.fullProfile(id) : staffApi.getById(id)),
     enabled: Boolean(id),
     retry: false,
   });

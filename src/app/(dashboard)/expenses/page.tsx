@@ -28,7 +28,7 @@ import { PageShell } from "@/components/shared/PageShell";
 import { TableSkeleton } from "@/components/shared/Skeleton";
 import { expensesApi } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
-import { EXPENSE_CATEGORIES, formatDate, formatPkr, getErrorMessage, toAmount } from "@/lib/utils";
+import { EXPENSE_CATEGORIES, displayUserName, formatDate, formatPkr, getErrorMessage, toAmount } from "@/lib/utils";
 import type { Expense } from "@/types";
 
 export default function ExpensesPage() {
@@ -68,7 +68,7 @@ export default function ExpensesPage() {
     { key: "title", header: "Title", cell: (row) => <span className="font-medium">{row.title}</span> },
     { key: "category", header: "Category", cell: (row) => row.category },
     { key: "amount", header: "Amount", cell: (row) => formatPkr(row.amount) },
-    { key: "by", header: "Logged by", cell: (row) => row.createdBy?.email ?? "—" },
+    { key: "by", header: "Logged by", cell: (row) => displayUserName(row.createdBy) },
     { key: "date", header: "Date", cell: (row) => formatDate(row.createdAt) },
   ];
 

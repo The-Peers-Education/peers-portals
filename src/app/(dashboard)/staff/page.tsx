@@ -46,6 +46,7 @@ export default function StaffPage() {
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({
+    fullName: "",
     email: "",
     password: "",
     role: "TEACHER" as Role,
@@ -62,7 +63,7 @@ export default function StaffPage() {
     onSuccess: async () => {
       toast.success("Team member invited");
       setOpen(false);
-      setForm({ email: "", password: "", role: "TEACHER" });
+      setForm({ fullName: "", email: "", password: "", role: "TEACHER" });
       await queryClient.invalidateQueries({ queryKey: ["staff", branchId] });
     },
     onError: (error) => toast.error(getErrorMessage(error, "Unable to invite staff")),
@@ -80,17 +81,29 @@ export default function StaffPage() {
 
   const columns: DataTableColumn<User>[] = [
     {
+      key: "name",
+      header: "Name",
+      className: "min-w-0 w-[16%]",
+      cell: (row) => (
+        <Link href={portalPath(user?.role, `/staff/${row.id}`)} className="block truncate font-medium text-deep-navy">
+          {row.fullName?.trim() || "—"}
+        </Link>
+      ),
+    },
+    {
       key: "email",
       header: "Email",
+      className: "min-w-0 w-[22%]",
       cell: (row) => (
-        <Link href={portalPath(user?.role, `/staff/${row.id}`)} className="font-medium hover:underline">
+        <span className="block truncate" title={row.email}>
           {row.email}
-        </Link>
+        </span>
       ),
     },
     {
       key: "role",
       header: "Role",
+      className: "w-[12rem]",
       cell: (row) =>
         row.id === user?.id || row.role === "SUPER_ADMIN" ? (
           <span>{ROLE_LABELS[row.role]}</span>
@@ -101,7 +114,7 @@ export default function StaffPage() {
               updateMutation.mutate({ id: row.id, payload: { role: value as Role } })
             }
           >
-            <SelectTrigger className="h-10 w-44" aria-label={`Role for ${row.email}`}>
+            <SelectTrigger className="h-10 w-full max-w-[10rem]" aria-label={`Role for ${row.fullName?.trim() || row.email}`}>
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -117,22 +130,31 @@ export default function StaffPage() {
     {
       key: "campus",
       header: "Campus",
-      cell: (row) => row.branch?.name ?? (row.role === "SUPER_ADMIN" ? "All campuses" : "—"),
+      className: "min-w-0 w-[18%]",
+      cell: (row) => {
+        const campus = row.branch?.name ?? (row.role === "SUPER_ADMIN" ? "All campuses" : "—");
+        return (
+          <span className="block truncate" title={campus}>
+            {campus}
+          </span>
+        );
+      },
     },
     {
       key: "status",
       header: "Status",
+      className: "w-[6.5rem]",
       cell: (row) => (
         <Badge variant={row.isActive === false ? "secondary" : "default"}>
           {row.isActive === false ? "Inactive" : "Active"}
         </Badge>
       ),
     },
-    { key: "joined", header: "Joined", cell: (row) => formatDate(row.createdAt) },
+    { key: "joined", header: "Joined", className: "w-[8rem]", cell: (row) => formatDate(row.createdAt) },
     {
       key: "actions",
       header: "",
-      className: "text-right",
+      className: "w-[12rem] text-right",
       cell: (row) => (
         <div className="flex justify-end gap-2">
           <Button size="sm" variant="outline" asChild>
@@ -161,6 +183,7 @@ export default function StaffPage() {
   function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     inviteMutation.mutate({
+      fullName: form.fullName.trim(),
       email: form.email,
       password: form.password,
       role: form.role,
@@ -209,6 +232,7 @@ export default function StaffPage() {
           data={staffQuery.data ?? []}
           rowKey={(row) => row.id}
           empty="No staff members found for this campus."
+          tableClassName="table-fixed"
         />
       )}
 
@@ -221,6 +245,13 @@ export default function StaffPage() {
             </DialogDescription>
           </DialogHeader>
           <form className="grid gap-3" onSubmit={onSubmit}>
+            <Input
+              id="staff-name"
+              label="Name"
+              required
+              value={form.fullName}
+              onChange={(event) => setForm((current) => ({ ...current, fullName: event.target.value }))}
+            />
             <Input
               id="staff-email"
               label="Email"
@@ -239,21 +270,21 @@ export default function StaffPage() {
               onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))}
             />
             <Field id="staff-role" label="Role">
-            <Select
-              value={form.role}
-              onValueChange={(value) => setForm((current) => ({ ...current, role: value as Role }))}
-            >
-              <SelectTrigger id="staff-role" className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {INVITE_ROLES.map((role) => (
-                  <SelectItem key={role} value={role}>
-                    {ROLE_LABELS[role]}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              <Select
+                value={form.role}
+                onValueChange={(value) => setForm((current) => ({ ...current, role: value as Role }))}
+              >
+                <SelectTrigger id="staff-role" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {INVITE_ROLES.map((role) => (
+                    <SelectItem key={role} value={role}>
+                      {ROLE_LABELS[role]}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </Field>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>

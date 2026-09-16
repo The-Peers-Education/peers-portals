@@ -31,7 +31,7 @@ import { TableSkeleton } from "@/components/shared/Skeleton";
 import { payrollApi } from "@/lib/api";
 import { canManageStaff, ROLE_LABELS } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
-import { formatDate, formatMonthYear, formatPkr, getErrorMessage, MONTHS } from "@/lib/utils";
+import { formatDate, formatMonthYear, formatPkr, getErrorMessage, MONTHS, displayUserName } from "@/lib/utils";
 import type { LeaveRequest, PayrollSlip, StaffSalaryProfile } from "@/types";
 
 export default function PayrollPage() {
@@ -101,7 +101,7 @@ export default function PayrollPage() {
   const years = [currentYear - 1, currentYear, currentYear + 1];
 
   const slipColumns: DataTableColumn<PayrollSlip>[] = [
-    { key: "staff", header: "Staff", cell: (row) => <span className="font-medium">{row.user?.email ?? row.userId}</span> },
+    { key: "staff", header: "Name", cell: (row) => <span className="font-medium">{row.user?.fullName?.trim() || "—"}</span> },
     { key: "gross", header: "Gross", cell: (row) => formatPkr(row.baseSalary) },
     { key: "deductions", header: "Deductions", cell: (row) => formatPkr(row.deductions) },
     { key: "net", header: "Net", cell: (row) => formatPkr(row.netSalary) },
@@ -131,7 +131,7 @@ export default function PayrollPage() {
   ];
 
   const leaveColumns: DataTableColumn<LeaveRequest>[] = [
-    { key: "staff", header: "Staff", cell: (row) => row.user?.email ?? row.userId },
+    { key: "staff", header: "Name", cell: (row) => row.user?.fullName?.trim() || "—" },
     { key: "type", header: "Type", cell: (row) => row.leaveType },
     {
       key: "dates",
@@ -167,7 +167,8 @@ export default function PayrollPage() {
   ];
 
   const profileColumns: DataTableColumn<StaffSalaryProfile>[] = [
-    { key: "email", header: "Staff", cell: (row) => <span className="font-medium">{row.email}</span> },
+    { key: "name", header: "Name", cell: (row) => <span className="font-medium">{row.fullName?.trim() || "—"}</span> },
+    { key: "email", header: "Email", cell: (row) => row.email },
     { key: "role", header: "Role", cell: (row) => ROLE_LABELS[row.role] },
     { key: "title", header: "Designation", cell: (row) => row.designation ?? "—" },
     { key: "salary", header: "Base salary", cell: (row) => (row.baseSalary === null ? "—" : formatPkr(row.baseSalary)) },
@@ -333,7 +334,7 @@ export default function PayrollPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Salary profile</DialogTitle>
-            <DialogDescription>{profile?.email}</DialogDescription>
+            <DialogDescription>{profile ? displayUserName(profile) : ""}</DialogDescription>
           </DialogHeader>
           <form className="grid gap-3" onSubmit={onSaveProfile}>
             <Input

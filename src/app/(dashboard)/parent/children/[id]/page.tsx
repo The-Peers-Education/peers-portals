@@ -14,7 +14,7 @@ import { portalPath } from "@/lib/paths";
 import { useAuthStore } from "@/lib/store";
 import { getErrorMessage } from "@/lib/utils";
 
-export default function StudentProfilePage() {
+export default function ParentChildProfilePage() {
   const params = useParams<{ id: string }>();
   const id = params.id;
   const user = useAuthStore((state) => state.user);
@@ -39,8 +39,8 @@ export default function StudentProfilePage() {
     return (
       <EmptyHint
         icon={Users}
-        title="Student not found"
-        description={getErrorMessage(profileQuery.error, "This student record is unavailable.")}
+        title="Child profile unavailable"
+        description={getErrorMessage(profileQuery.error, "This student is not linked to your account.")}
       />
     );
   }
@@ -51,9 +51,9 @@ export default function StudentProfilePage() {
         student={profile}
         action={
           <Button variant="outline" asChild>
-            <Link href={portalPath(user?.role, "/students")}>
+            <Link href={portalPath(user?.role, "/dashboard")}>
               <ArrowLeft className="size-5" strokeWidth={1.75} />
-              Directory
+              Dashboard
             </Link>
           </Button>
         }

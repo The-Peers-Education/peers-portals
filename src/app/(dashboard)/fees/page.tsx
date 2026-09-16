@@ -130,7 +130,7 @@ export default function FeesPage() {
   const columns: DataTableColumn<FeeChallan>[] = [
     {
       key: "student",
-      header: "Student",
+      header: "Name",
       cell: (row) => row.student?.fullName ?? "—",
     },
     {

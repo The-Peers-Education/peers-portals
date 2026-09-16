@@ -140,7 +140,7 @@ export default function LibraryPage() {
   ];
 
   const loanColumns: DataTableColumn<BookLoan>[] = [
-    { key: "student", header: "Student", cell: (row) => row.student?.fullName ?? "—" },
+    { key: "student", header: "Name", cell: (row) => row.student?.fullName ?? "—" },
     { key: "book", header: "Title", cell: (row) => row.book?.title ?? "—" },
     { key: "due", header: "Due", cell: (row) => formatDate(row.dueDate) },
     {

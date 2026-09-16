@@ -19,7 +19,7 @@ import { PageShell } from "@/components/shared/PageShell";
 import { AttendanceSkeleton } from "@/components/shared/Skeleton";
 import { ATTENDANCE_OPTIONS } from "@/components/shared/StatusBadge";
 import { StaggerContainer, StaggerItem } from "@/components/ui/animations";
-import { attendanceApi, studentsApi } from "@/lib/api";
+import { academicsApi, attendanceApi, studentsApi } from "@/lib/api";
 import { useAuthStore } from "@/lib/store";
 import { cn, getErrorMessage, todayKey } from "@/lib/utils";
 import type { AttendanceStatus } from "@/types";
@@ -28,6 +28,7 @@ const STATUSES: AttendanceStatus[] = ["PRESENT", "ABSENT", "LATE", "LEAVE"];
 
 export default function AttendancePage() {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const branchId = useAuthStore((state) => state.activeBranchId ?? state.user?.branchId);
   const [date, setDate] = useState(todayKey());
   const [classFilter, setClassFilter] = useState("all");
@@ -46,6 +47,22 @@ export default function AttendancePage() {
     enabled: Boolean(branchId),
   });
 
+  const myClassesQuery = useQuery({
+    queryKey: ["my-classes", branchId],
+    queryFn: academicsApi.myClasses,
+    enabled: Boolean(branchId) && user?.role === "TEACHER",
+  });
+
+  const assignedLabels = useMemo(() => {
+    return (myClassesQuery.data ?? []).map(
+      (section) => section.label ?? `${section.class?.name ?? ""}-${section.name}`,
+    );
+  }, [myClassesQuery.data]);
+
+  if (user?.role === "TEACHER" && assignedLabels.length > 0 && classFilter === "all") {
+    setClassFilter(assignedLabels[0]);
+  }
+
   const attendanceQuery = useQuery({
     queryKey: ["attendance", branchId, date],
     queryFn: () => attendanceApi.list({ date }),
@@ -63,9 +80,12 @@ export default function AttendancePage() {
   const marks = { ...savedMarks, ...draft.marks };
 
   const classSections = useMemo(() => {
+    if (user?.role === "TEACHER" && assignedLabels.length > 0) {
+      return [...assignedLabels].sort();
+    }
     const values = new Set((studentsQuery.data ?? []).map((student) => student.classSection));
     return Array.from(values).sort();
-  }, [studentsQuery.data]);
+  }, [studentsQuery.data, user?.role, assignedLabels]);
 
   const visibleStudents = useMemo(() => {
     return (studentsQuery.data ?? []).filter(
@@ -137,7 +157,9 @@ export default function AttendancePage() {
               <SelectValue placeholder="All classes" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All classes</SelectItem>
+              {user?.role === "TEACHER" && assignedLabels.length > 0 ? null : (
+                <SelectItem value="all">All classes</SelectItem>
+              )}
               {classSections.map((section) => (
                 <SelectItem key={section} value={section}>
                   {section}

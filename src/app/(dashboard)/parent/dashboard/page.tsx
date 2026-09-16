@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Banknote, BookOpen, CalendarCheck, GraduationCap, Users } from "lucide-react";
@@ -22,11 +23,14 @@ import { StatCardSkeleton, TableSkeleton } from "@/components/shared/Skeleton";
 import { FeeStatusBadge, HomeworkStatusBadge, ATTENDANCE_OPTIONS } from "@/components/shared/StatusBadge";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/animations";
 import { parentApi, homeworkApi } from "@/lib/api";
+import { portalPath } from "@/lib/paths";
 import { formatDate, formatMonthYear, formatPkr, getErrorMessage, cn } from "@/lib/utils";
+import { useAuthStore } from "@/lib/store";
 import type { AttendanceStatus, ParentChild } from "@/types";
 
 export default function ParentDashboardPage() {
   const queryClient = useQueryClient();
+  const user = useAuthStore((state) => state.user);
   const [childId, setChildId] = useState("");
   const [submitOpen, setSubmitOpen] = useState(false);
   const [homeworkId, setHomeworkId] = useState("");
@@ -133,6 +137,16 @@ export default function ParentDashboardPage() {
           );
         })}
       </div>
+
+      {selected ? (
+        <div>
+          <Button variant="outline" asChild>
+            <Link href={portalPath(user?.role, `/children/${selected.id}`)}>
+              Open {selected.fullName}'s profile
+            </Link>
+          </Button>
+        </div>
+      ) : null}
 
       {summaryQuery.isLoading ? (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">

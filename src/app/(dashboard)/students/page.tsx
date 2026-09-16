@@ -155,7 +155,7 @@ export default function StudentsPage() {
   }, [studentsQuery.data, classFilter, search]);
 
   const columns: DataTableColumn<Student>[] = [
-    { key: "name", header: "Student", cell: (row) => (
+    { key: "name", header: "Name", cell: (row) => (
       <Link href={portalPath(user?.role, `/students/${row.id}`)} className="font-medium text-deep-navy">
         {row.fullName}
       </Link>

@@ -42,6 +42,7 @@ export interface Student {
   fullName: string;
   guardianPhone?: string | null;
   classSection: string;
+  sectionId?: string | null;
   status: StudentStatus;
 }
 
@@ -97,7 +98,7 @@ export interface Expense {
   receiptUrl?: string | null;
   createdById: string;
   createdAt: string;
-  createdBy?: { id: string; email: string; role: Role };
+  createdBy?: { id: string; email: string; fullName?: string | null; role: Role };
 }
 
 export interface FeeReportMonth {
@@ -221,6 +222,7 @@ export interface RegisterStaffInput {
   password: string;
   role: Role;
   branchId?: string | null;
+  fullName?: string;
 }
 
 export interface UpdateStaffInput {
@@ -234,11 +236,32 @@ export interface UpdateStaffProfileInput {
   designation?: string;
 }
 
+export interface AcademicStaffRef {
+  id: string;
+  email: string;
+  fullName?: string | null;
+  role: Role;
+}
+
+export interface SubjectAssignment {
+  id: string;
+  subject: Pick<AcademicSubject, "id" | "name" | "code">;
+  teacher: AcademicStaffRef;
+}
+
 export interface AcademicSection {
   id: string;
   name: string;
   capacity: number;
   classId: string;
+  roomNumber?: string | null;
+  classTeacherId?: string | null;
+  classTeacher?: AcademicStaffRef | null;
+  subjectAssignments?: SubjectAssignment[];
+  _count?: { students: number };
+  isClassIncharge?: boolean;
+  label?: string;
+  class?: { id: string; name: string; code: string; branchId?: string };
 }
 
 export interface AcademicSubject {
@@ -358,6 +381,7 @@ export interface Classroom {
 export interface TimetableTeacher {
   id: string;
   email: string;
+  fullName?: string | null;
   role: Role;
 }
 
@@ -395,6 +419,7 @@ export interface UpsertTimetableSlotInput {
 export interface StaffSalaryProfile {
   userId: string;
   email: string;
+  fullName?: string | null;
   role: Role;
   isActive: boolean;
   baseSalary: number | null;
@@ -412,7 +437,7 @@ export interface LeaveRequest {
   status: LeaveStatus;
   reason: string;
   createdAt: string;
-  user?: Pick<User, "id" | "email" | "role">;
+  user?: Pick<User, "id" | "email" | "fullName" | "role">;
 }
 
 export interface PayrollSlip {
@@ -426,7 +451,7 @@ export interface PayrollSlip {
   status: PayrollStatus;
   paidAt?: string | null;
   createdAt: string;
-  user?: Pick<User, "id" | "email" | "role">;
+  user?: Pick<User, "id" | "email" | "fullName" | "role">;
 }
 
 export type ParentRelationship = "FATHER" | "MOTHER" | "GUARDIAN";
@@ -553,6 +578,7 @@ export interface StaffProfile {
   branchId: string | null;
   isActive: boolean;
   createdAt: string;
+  employmentStatus?: "ACTIVE" | "INACTIVE" | "ON_LEAVE";
   branch?: Pick<Branch, "id" | "name" | "code"> | null;
   staffProfile: {
     designation: string;
@@ -565,7 +591,34 @@ export interface StaffProfile {
     startTime: string;
     endTime: string;
     subject: { id: string; name: string; code: string };
+    classroom?: { id: string; roomNumber: string } | null;
     section: { id: string; name: string; class: { id: string; name: string; code: string } };
+  }>;
+  teachingAssignments?: Array<{
+    section: { id: string; name: string; class: { id: string; name: string; code: string } };
+    subjects: Array<{ id: string; name: string; code: string }>;
+  }>;
+  leaves?: LeaveRequest[];
+  leaveStats?: {
+    pending: number;
+    approved: number;
+    rejected: number;
+    leaveDaysThisMonth: number;
+    presentDaysThisMonth: number;
+  };
+  classAttendance?: Array<{
+    sectionId: string;
+    studentCount: number;
+    markedCount: number;
+    presentCount: number;
+    absentCount: number;
+    leaveCount: number;
+    recentAbsences: Array<{
+      date: string;
+      studentId: string;
+      fullName: string;
+      rollNumber: string;
+    }>;
   }>;
   payroll: Array<{
     id: string;
@@ -577,6 +630,64 @@ export interface StaffProfile {
     status: PayrollStatus;
     paidAt?: string | null;
   }>;
+}
+
+export interface StudentGuardian {
+  relationship: ParentRelationship;
+  fullName?: string | null;
+  email?: string | null;
+  occupation?: string | null;
+  address?: string | null;
+}
+
+export interface StudentAcademicTerm {
+  examTerm: { id: string; name: string; startDate: string; endDate: string };
+  subjects: Array<{
+    subjectId: string;
+    name: string;
+    code: string;
+    marksObtained: number;
+    totalMarks: number;
+    remarks?: string | null;
+    percentage: number;
+    letter: string;
+    gpa: number;
+  }>;
+  obtainedTotal: number;
+  totalMarks: number;
+  percentage: number;
+  letter: string;
+  gpa: number;
+  rank: number | null;
+  cohortSize: number;
+}
+
+export interface StudentFullProfile extends Student {
+  branch?: Pick<Branch, "id" | "name" | "code"> | null;
+  section?: {
+    id: string;
+    name: string;
+    class: { id: string; name: string; code: string };
+  } | null;
+  guardians: StudentGuardian[];
+  attendanceSummary: {
+    present: number;
+    late: number;
+    absent: number;
+    leave: number;
+    marked: number;
+    percentage: number | null;
+  };
+  attendance: AttendanceRecord[];
+  academicTerms: StudentAcademicTerm[];
+  feeSummary?: {
+    issued: number;
+    collected: number;
+    outstanding: number;
+    challanCount: number;
+    overdueCount: number;
+  };
+  feeChallans?: FeeChallan[];
 }
 
 export interface ChangePasswordInput {
@@ -620,6 +731,24 @@ export interface DashboardAnalytics {
     createdAt: string;
   }>;
   canSeeFinance: boolean;
+  newStudentsThisMonth: number;
+  newStudentsLastMonth: number;
+  newStudentsChangePct: number;
+  studentsLeftThisMonth: number;
+  studentsLeftLastMonth: number;
+  studentsLeftChangePct: number;
+  overallPassPercentage: number;
+  overallAcademicStanding: "EXCELLENT" | "SATISFACTORY" | "NEEDS_ATTENTION";
+  topPerformingClass: { className: string; averageScore: number } | null;
+  needsAttentionClass: { className: string; averageScore: number } | null;
+  boardMilestones: Array<{
+    id: string;
+    title: string;
+    category: "MATRIC" | "INTER";
+    date: string;
+    status: "COMPLETE" | "DUE_SOON" | "UPCOMING";
+    daysRemaining: number;
+  }>;
 }
 
 export type BookLoanStatus = "ISSUED" | "RETURNED" | "OVERDUE";

@@ -68,21 +68,22 @@ export function Header({
       </nav>
 
       <div className="flex shrink-0 items-center gap-3">
-        <BranchSwitcher placement="header" />
         <button
           type="button"
           onClick={openPalette}
           aria-label="Open command palette"
           aria-keyshortcuts="Control+K Meta+K"
           className={cn(
-            "inline-flex h-11 items-center gap-2 rounded-[10px] border border-deep-navy/15 bg-white px-3 text-sm text-muted-foreground",
+            "inline-flex h-11 w-44 items-center gap-2 rounded-[10px] border border-deep-navy/15 bg-white px-3 text-sm text-muted-foreground sm:w-64 md:w-80",
             clickable,
             focusRing,
           )}
         >
-          <Search size={20} strokeWidth={1.75} aria-hidden />
-          <kbd className="hidden font-sans text-xs text-muted-foreground sm:inline">{shortcut}</kbd>
+          <Search size={20} strokeWidth={1.75} aria-hidden className="shrink-0" />
+          <span className="min-w-0 flex-1 truncate text-left">Jump to…</span>
+          <kbd className="hidden shrink-0 font-sans text-xs text-muted-foreground sm:inline">{shortcut}</kbd>
         </button>
+        <BranchSwitcher placement="header" />
         <UserMenu />
 
         <button

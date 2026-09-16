@@ -28,7 +28,7 @@ import { TableSkeleton } from "@/components/shared/Skeleton";
 import { academicsApi, payrollApi, timetableApi } from "@/lib/api";
 import { canManageTimetable } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
-import { formatTimeRange, getErrorMessage, todayKey } from "@/lib/utils";
+import { displayUserName, formatTimeRange, getErrorMessage, todayKey } from "@/lib/utils";
 import type { DayOfWeek, LeaveType, TimetableSlot } from "@/types";
 
 const DAYS: Array<{ id: DayOfWeek; label: string }> = [
@@ -273,7 +273,7 @@ export default function TimetablePage() {
             <SelectContent>
               {(teachersQuery.data ?? []).map((item) => (
                 <SelectItem key={item.id} value={item.id}>
-                  {item.email}
+                  {displayUserName(item)}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -321,7 +321,7 @@ export default function TimetablePage() {
                           >
                             <p className="font-medium">{slot.subject.name}</p>
                             <p className="text-xs text-muted-foreground">{slot.classroom.roomNumber}</p>
-                            <p className="text-xs text-muted-foreground">{slot.teacher.email}</p>
+                            <p className="text-xs text-muted-foreground">{displayUserName(slot.teacher)}</p>
                           </button>
                         ) : canEdit ? (
                           <button
@@ -404,7 +404,7 @@ export default function TimetablePage() {
               <SelectContent>
                 {(teachersQuery.data ?? []).map((item) => (
                   <SelectItem key={item.id} value={item.id}>
-                    {item.email}
+                    {displayUserName(item)}
                   </SelectItem>
                 ))}
               </SelectContent>

@@ -48,10 +48,46 @@ export default function AcademicGradesPage() {
     queryFn: academicsApi.listExams,
     enabled: Boolean(branchId),
   });
+  const myClassesQuery = useQuery({
+    queryKey: ["my-classes", branchId],
+    queryFn: academicsApi.myClasses,
+    enabled: Boolean(branchId) && user?.role === "TEACHER",
+  });
 
-  const selectedClass = (classesQuery.data ?? []).find((item) => item.id === classId);
-  const sections = selectedClass?.sections ?? [];
-  const subjects = selectedClass?.subjects ?? [];
+  const assigned = myClassesQuery.data ?? [];
+  const isTeacher = user?.role === "TEACHER";
+
+  if (isTeacher && assigned.length > 0 && !classId) {
+    const first = assigned[0];
+    const nextClassId = first.class?.id ?? first.classId;
+    if (nextClassId) {
+      setClassId(nextClassId);
+      setSectionId(first.id);
+      const firstSubject = first.subjectAssignments?.[0]?.subject.id;
+      if (firstSubject) setSubjectId(firstSubject);
+    }
+  }
+
+  const classOptions = useMemo(() => {
+    const all = classesQuery.data ?? [];
+    if (!isTeacher || assigned.length === 0) return all;
+    const ids = new Set(assigned.map((section) => section.class?.id ?? section.classId));
+    return all.filter((item) => ids.has(item.id));
+  }, [classesQuery.data, isTeacher, assigned]);
+
+  const selectedClass = classOptions.find((item) => item.id === classId);
+  const sections =
+    isTeacher && assigned.length > 0
+      ? (selectedClass?.sections ?? []).filter((section) => assigned.some((item) => item.id === section.id))
+      : (selectedClass?.sections ?? []);
+  const assignedSection = assigned.find((item) => item.id === sectionId);
+  const teacherSubjectIds = new Set(
+    (assignedSection?.subjectAssignments ?? []).map((item) => item.subject.id),
+  );
+  const subjects =
+    isTeacher && assignedSection && !assignedSection.isClassIncharge && teacherSubjectIds.size > 0
+      ? (selectedClass?.subjects ?? []).filter((subject) => teacherSubjectIds.has(subject.id))
+      : (selectedClass?.subjects ?? []);
   const ready = Boolean(classId && sectionId && examTermId && subjectId);
 
   const gradebookQuery = useQuery({
@@ -98,8 +134,8 @@ export default function AcademicGradesPage() {
 
   const columns: DataTableColumn<GradebookRow>[] = useMemo(
     () => [
+      { key: "name", header: "Name", cell: (row) => <span className="font-medium">{row.fullName}</span> },
       { key: "roll", header: "Roll", cell: (row) => row.rollNumber },
-      { key: "name", header: "Student", cell: (row) => <span className="font-medium">{row.fullName}</span> },
       {
         key: "marks",
         header: "Marks obtained",
@@ -211,8 +247,10 @@ export default function AcademicGradesPage() {
           value={classId}
           onValueChange={(value) => {
             setClassId(value);
-            setSectionId("");
-            setSubjectId("");
+            const nextSection = assigned.find((item) => (item.class?.id ?? item.classId) === value);
+            setSectionId(nextSection?.id ?? "");
+            const nextSubject = nextSection?.subjectAssignments?.[0]?.subject.id;
+            setSubjectId(nextSubject ?? "");
             setDrafts({});
           }}
         >
@@ -220,7 +258,7 @@ export default function AcademicGradesPage() {
             <SelectValue placeholder="Select class" />
           </SelectTrigger>
           <SelectContent>
-            {(classesQuery.data ?? []).map((item) => (
+            {classOptions.map((item) => (
               <SelectItem key={item.id} value={item.id}>
                 {item.name}
               </SelectItem>

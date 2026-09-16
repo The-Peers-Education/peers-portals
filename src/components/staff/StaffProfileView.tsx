@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo, useState, type FormEvent, type ReactNode } from "react";
+import Link from "next/link";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CalendarRange, Pencil, Receipt } from "lucide-react";
+import { Banknote, CalendarOff, CalendarRange, FileText, IdCard, Pencil, Receipt, UserMinus } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -20,13 +21,18 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DataTable, type DataTableColumn } from "@/components/shared/DataTable";
 import { EmptyHint, PageHeader } from "@/components/shared/PageHeader";
 import { PasswordChangeForm } from "@/components/staff/PasswordChangeForm";
-import { PayrollStatusBadge } from "@/components/shared/StatusBadge";
+import { LeaveStatusBadge, PayrollStatusBadge } from "@/components/shared/StatusBadge";
+import { StatCard } from "@/components/shared/StatCard";
+import { PayslipSheet } from "@/components/payroll/PayslipSheet";
 import { staffApi } from "@/lib/api";
-import { ROLE_LABELS } from "@/lib/rbac";
+import { printDocument } from "@/lib/pdf";
+import { portalPath } from "@/lib/paths";
+import { canManagePayroll, canManageStaff, ROLE_LABELS } from "@/lib/rbac";
 import { useAuthStore } from "@/lib/store";
 import { formatDate, formatMonthYear, formatPkr, formatTimeRange, getErrorMessage } from "@/lib/utils";
-import type { DayOfWeek, StaffProfile } from "@/types";
+import type { DayOfWeek, LeaveRequest, LeaveType, StaffProfile } from "@/types";
 
+const DAY_ORDER: DayOfWeek[] = ["MON", "TUE", "WED", "THU", "FRI", "SAT"];
 const DAY_LABELS: Record<DayOfWeek, string> = {
   MON: "Monday",
   TUE: "Tuesday",
@@ -35,9 +41,26 @@ const DAY_LABELS: Record<DayOfWeek, string> = {
   FRI: "Friday",
   SAT: "Saturday",
 };
+const LEAVE_TYPE_LABELS: Record<LeaveType, string> = {
+  CASUAL: "Casual",
+  SICK: "Sick",
+  UNPAID: "Unpaid",
+};
 
 function displayName(staff: StaffProfile) {
   return staff.fullName?.trim() || staff.staffProfile?.designation?.trim() || staff.email;
+}
+
+function initials(staff: StaffProfile) {
+  const name = displayName(staff);
+  const parts = name.split(/\s+/).filter(Boolean);
+  return ((parts[0]?.[0] ?? "S") + (parts[1]?.[0] ?? "")).toUpperCase();
+}
+
+function employmentLabel(staff: StaffProfile) {
+  if (staff.employmentStatus === "ON_LEAVE") return "On leave";
+  if (staff.employmentStatus === "INACTIVE" || staff.isActive === false) return "Inactive";
+  return "Active";
 }
 
 export function StaffProfileView({
@@ -55,8 +78,10 @@ export function StaffProfileView({
   const authUser = useAuthStore((state) => state.user);
   const setUser = useAuthStore((state) => state.setUser);
   const joined = staff.staffProfile?.joinedDate ?? staff.createdAt;
+  const canAdmin = canManageStaff(authUser?.role);
   const tab = isSelf && initialTab === "security" ? "security" : "overview";
   const [open, setOpen] = useState(false);
+  const [payslip, setPayslip] = useState<StaffProfile["payroll"][number] | null>(null);
   const [form, setForm] = useState({
     fullName: staff.fullName ?? "",
     email: staff.email,
@@ -90,6 +115,29 @@ export function StaffProfileView({
           </span>
         ),
       },
+      {
+        key: "room",
+        header: "Room",
+        cell: (row) => row.classroom?.roomNumber ?? "—",
+      },
+    ],
+    [],
+  );
+
+  const leaveColumns = useMemo<DataTableColumn<LeaveRequest>[]>(
+    () => [
+      { key: "type", header: "Type", cell: (row) => LEAVE_TYPE_LABELS[row.leaveType] ?? row.leaveType },
+      {
+        key: "dates",
+        header: "Dates",
+        cell: (row) => `${formatDate(row.startDate)} – ${formatDate(row.endDate)}`,
+      },
+      { key: "reason", header: "Reason", cell: (row) => row.reason },
+      {
+        key: "status",
+        header: "Status",
+        cell: (row) => <LeaveStatusBadge status={row.status} />,
+      },
     ],
     [],
   );
@@ -109,9 +157,28 @@ export function StaffProfileView({
         header: "Status",
         cell: (row) => <PayrollStatusBadge status={row.status} />,
       },
+      {
+        key: "print",
+        header: "",
+        className: "text-right",
+        cell: (row) => (
+          <Button size="sm" variant="outline" onClick={() => setPayslip(row)}>
+            Payslip
+          </Button>
+        ),
+      },
     ],
     [],
   );
+
+  const slotsByDay = useMemo(() => {
+    const map = new Map<DayOfWeek, StaffProfile["assignedClasses"]>();
+    for (const day of DAY_ORDER) map.set(day, []);
+    for (const slot of staff.assignedClasses) {
+      map.get(slot.dayOfWeek)?.push(slot);
+    }
+    return map;
+  }, [staff.assignedClasses]);
 
   const updateMutation = useMutation({
     mutationFn: () =>
@@ -137,6 +204,16 @@ export function StaffProfileView({
     onError: (error) => toast.error(getErrorMessage(error, "Unable to update profile")),
   });
 
+  const deactivateMutation = useMutation({
+    mutationFn: () => staffApi.update(staff.id, { isActive: staff.isActive === false }),
+    onSuccess: async () => {
+      toast.success(staff.isActive === false ? "Account activated" : "Account deactivated");
+      await queryClient.invalidateQueries({ queryKey: ["staff-profile"] });
+      await queryClient.invalidateQueries({ queryKey: ["staff"] });
+    },
+    onError: (error) => toast.error(getErrorMessage(error, "Unable to update account")),
+  });
+
   const details = [
     { label: "Name", value: displayName(staff) },
     { label: "Email", value: staff.email },
@@ -147,6 +224,8 @@ export function StaffProfileView({
     },
     { label: "Joined", value: formatDate(joined) },
     { label: "Staff ID", value: staff.id },
+    { label: "CNIC / ID number", value: "Not on file" },
+    { label: "Emergency contact", value: "Not on file" },
   ];
 
   function openEditor() {
@@ -170,31 +249,82 @@ export function StaffProfileView({
         description={
           isSelf
             ? "Your academic roles, assigned classes, payroll history, and account security."
-            : "Staff member details, assigned classes, and payroll history."
+            : "Employment, teaching load, leave, and payroll in one place."
         }
-        action={action}
+        action={
+          <div className="flex flex-wrap justify-end gap-2">
+            {action}
+            <Button type="button" variant="outline" onClick={openEditor}>
+              <Pencil className="size-5" strokeWidth={1.75} />
+              Edit profile
+            </Button>
+            {canAdmin && canManagePayroll(authUser?.role) ? (
+              <Button variant="outline" asChild>
+                <Link href={portalPath(authUser?.role, "/payroll")}>
+                  <Banknote className="size-5" strokeWidth={1.75} />
+                  Manage salary
+                </Link>
+              </Button>
+            ) : null}
+            {canAdmin && !isSelf && staff.role !== "SUPER_ADMIN" ? (
+              <Button
+                type="button"
+                variant="outline"
+                disabled={deactivateMutation.isPending}
+                onClick={() => deactivateMutation.mutate()}
+              >
+                <UserMinus className="size-5" strokeWidth={1.75} />
+                {staff.isActive === false ? "Activate account" : "Deactivate account"}
+              </Button>
+            ) : null}
+          </div>
+        }
       />
 
+      <Card>
+        <CardContent className="flex flex-col gap-4 pt-0 sm:flex-row sm:items-center">
+          <div className="flex size-16 shrink-0 items-center justify-center rounded-full bg-deep-navy text-lg font-semibold text-white">
+            {initials(staff)}
+          </div>
+          <dl className="grid flex-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div>
+              <dt className="text-sm text-muted-foreground">Designation</dt>
+              <dd className="font-medium">{staff.staffProfile?.designation || ROLE_LABELS[staff.role]}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Campus</dt>
+              <dd className="font-medium">{staff.branch?.name ?? (staff.role === "SUPER_ADMIN" ? "All campuses" : "—")}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Contact</dt>
+              <dd className="font-medium break-all">{staff.email}</dd>
+            </div>
+            <div>
+              <dt className="text-sm text-muted-foreground">Status</dt>
+              <dd>
+                <Badge variant={employmentLabel(staff) === "Active" ? "default" : "secondary"}>
+                  {employmentLabel(staff)}
+                </Badge>
+              </dd>
+            </div>
+          </dl>
+        </CardContent>
+      </Card>
+
       <Tabs defaultValue={tab} className="w-full gap-4">
-        <TabsList variant="line" className="w-full justify-start">
+        <TabsList variant="line" className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="classes">Assigned classes</TabsTrigger>
+          <TabsTrigger value="classes">Teaching schedule</TabsTrigger>
+          <TabsTrigger value="leave">Attendance & leaves</TabsTrigger>
           <TabsTrigger value="payroll">Payroll</TabsTrigger>
           {isSelf ? <TabsTrigger value="security">Security & password</TabsTrigger> : null}
         </TabsList>
 
-        <TabsContent value="overview">
+        <TabsContent value="overview" className="grid gap-4">
           <Card>
             <CardHeader>
-              <CardTitle>Account details</CardTitle>
-              <CardDescription className="flex items-center gap-2">
-                <Badge variant={staff.isActive === false ? "secondary" : "default"}>
-                  {staff.isActive === false ? "Inactive" : "Active"}
-                </Badge>
-                {staff.staffProfile?.designation ? (
-                  <span>{staff.staffProfile.designation}</span>
-                ) : null}
-              </CardDescription>
+              <CardTitle>Employment details</CardTitle>
+              <CardDescription>Joined date, identity, and campus assignment.</CardDescription>
               <CardAction>
                 <Button type="button" variant="outline" size="sm" onClick={openEditor}>
                   <Pencil className="size-4" strokeWidth={1.75} />
@@ -213,9 +343,47 @@ export function StaffProfileView({
               </dl>
             </CardContent>
           </Card>
+          <div className="grid gap-4 lg:grid-cols-2">
+            <Card>
+              <CardHeader>
+                <CardTitle>Qualifications</CardTitle>
+                <CardDescription>Academic credentials recorded for this staff member.</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-muted-foreground">No qualifications on file yet.</p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader>
+                <CardTitle>Documents</CardTitle>
+                <CardDescription>CV and employment scans stay with the HR record.</CardDescription>
+              </CardHeader>
+              <CardContent className="flex items-start gap-3 text-sm text-muted-foreground">
+                <FileText className="mt-0.5 size-5 shrink-0" strokeWidth={1.75} />
+                No CV or identity documents have been uploaded.
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
-        <TabsContent value="classes">
+        <TabsContent value="classes" className="grid gap-4">
+          {(staff.teachingAssignments ?? []).length > 0 ? (
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {staff.teachingAssignments?.map((assignment) => (
+                <Card key={assignment.section.id}>
+                  <CardHeader>
+                    <CardTitle>
+                      {assignment.section.class.name} {assignment.section.name}
+                    </CardTitle>
+                    <CardDescription>
+                      {assignment.subjects.map((subject) => subject.name).join(", ")}
+                    </CardDescription>
+                  </CardHeader>
+                </Card>
+              ))}
+            </div>
+          ) : null}
+
           {staff.assignedClasses.length === 0 ? (
             <EmptyHint
               icon={CalendarRange}
@@ -223,11 +391,142 @@ export function StaffProfileView({
               description="Timetable slots for this staff member will appear here."
             />
           ) : (
+            <>
+              <div className="overflow-x-auto rounded-[10px] border border-cloud">
+                <table className="w-full min-w-[40rem] text-sm">
+                  <thead>
+                    <tr className="border-b bg-muted/40 text-left">
+                      <th className="px-3 py-2 font-medium">Time</th>
+                      {DAY_ORDER.map((day) => (
+                        <th key={day} className="px-3 py-2 font-medium">
+                          {DAY_LABELS[day]}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {Array.from(
+                      new Set(staff.assignedClasses.map((slot) => `${slot.startTime}-${slot.endTime}`)),
+                    ).map((timeKey) => {
+                      const [startTime, endTime] = timeKey.split("-");
+                      return (
+                        <tr key={timeKey} className="border-b last:border-0">
+                          <td className="px-3 py-2 text-muted-foreground">
+                            {formatTimeRange(startTime, endTime)}
+                          </td>
+                          {DAY_ORDER.map((day) => {
+                            const slot = (slotsByDay.get(day) ?? []).find(
+                              (item) => item.startTime === startTime && item.endTime === endTime,
+                            );
+                            return (
+                              <td key={day} className="px-3 py-2 align-top">
+                                {slot ? (
+                                  <div>
+                                    <p className="font-medium">{slot.subject.name}</p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {slot.section.class.name} {slot.section.name}
+                                      {slot.classroom?.roomNumber ? ` · ${slot.classroom.roomNumber}` : ""}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <span className="text-muted-foreground">—</span>
+                                )}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+              <DataTable
+                columns={classColumns}
+                data={staff.assignedClasses}
+                rowKey={(row) => row.id}
+                empty="No assigned classes."
+              />
+            </>
+          )}
+
+          {(staff.classAttendance ?? []).length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle>Class attendance logs</CardTitle>
+                <CardDescription>Marked days for students in assigned sections (last 45 days).</CardDescription>
+              </CardHeader>
+              <CardContent className="grid gap-4">
+                {staff.classAttendance?.map((row) => {
+                  const assignment = staff.teachingAssignments?.find((item) => item.section.id === row.sectionId);
+                  const label = assignment
+                    ? `${assignment.section.class.name} ${assignment.section.name}`
+                    : row.sectionId;
+                  return (
+                    <div key={row.sectionId} className="grid gap-2 rounded-[10px] border border-cloud px-3 py-3">
+                      <p className="font-medium">{label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {row.studentCount} students · {row.presentCount} present · {row.absentCount} absent ·{" "}
+                        {row.leaveCount} leave
+                      </p>
+                      {row.recentAbsences.length > 0 ? (
+                        <ul className="text-sm">
+                          {row.recentAbsences.map((absence) => (
+                            <li key={`${absence.studentId}-${absence.date}`} className="flex justify-between gap-3">
+                              <span>
+                                {absence.fullName} ({absence.rollNumber})
+                              </span>
+                              <span className="text-muted-foreground">{formatDate(absence.date)}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">No recent absences.</p>
+                      )}
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          ) : null}
+        </TabsContent>
+
+        <TabsContent value="leave" className="grid gap-4">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <StatCard
+              title="Present this month"
+              value={String(staff.leaveStats?.presentDaysThisMonth ?? "—")}
+              hint="Calendar days minus approved leave"
+              icon={CalendarRange}
+            />
+            <StatCard
+              title="Leave days"
+              value={String(staff.leaveStats?.leaveDaysThisMonth ?? 0)}
+              hint="Approved overlap in the current month"
+              icon={CalendarOff}
+            />
+            <StatCard
+              title="Pending requests"
+              value={String(staff.leaveStats?.pending ?? 0)}
+              icon={IdCard}
+            />
+            <StatCard
+              title="Approved requests"
+              value={String(staff.leaveStats?.approved ?? 0)}
+              icon={Receipt}
+            />
+          </div>
+          {(staff.leaves ?? []).length === 0 ? (
+            <EmptyHint
+              icon={CalendarOff}
+              title="No leave history"
+              description="Leave requests for this staff member will appear here."
+            />
+          ) : (
             <DataTable
-              columns={classColumns}
-              data={staff.assignedClasses}
+              columns={leaveColumns}
+              data={staff.leaves ?? []}
               rowKey={(row) => row.id}
-              empty="No assigned classes."
+              empty="No leave history."
             />
           )}
         </TabsContent>
@@ -237,15 +536,23 @@ export function StaffProfileView({
             <EmptyHint
               icon={Receipt}
               title="No payroll history"
-              description="Generated payslips for the last 12 months will appear here."
+              description="Generated payslips will appear here."
             />
           ) : (
-            <DataTable
-              columns={payrollColumns}
-              data={staff.payroll}
-              rowKey={(row) => row.id}
-              empty="No payroll history."
-            />
+            <div className="grid gap-4">
+              {staff.staffProfile ? (
+                <p className="text-sm text-muted-foreground">
+                  Base salary {formatPkr(staff.staffProfile.baseSalary)}. Allowances are not tracked separately;
+                  unpaid-leave deductions appear on each slip.
+                </p>
+              ) : null}
+              <DataTable
+                columns={payrollColumns}
+                data={staff.payroll}
+                rowKey={(row) => row.id}
+                empty="No payroll history."
+              />
+            </div>
           )}
         </TabsContent>
 
@@ -305,6 +612,36 @@ export function StaffProfileView({
               </Button>
             </DialogFooter>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={Boolean(payslip)} onOpenChange={(next) => !next && setPayslip(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Payslip</DialogTitle>
+            <DialogDescription>Print or download this monthly slip.</DialogDescription>
+          </DialogHeader>
+          {payslip ? (
+            <div id="printable-payslip" className="printable-area">
+              <PayslipSheet
+                slip={{
+                  ...payslip,
+                  userId: staff.id,
+                  createdAt: staff.createdAt,
+                  user: { id: staff.id, email: staff.email, fullName: staff.fullName, role: staff.role },
+                }}
+                campusName={staff.branch?.name}
+              />
+            </div>
+          ) : null}
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={() => setPayslip(null)}>
+              Close
+            </Button>
+            <Button type="button" onClick={() => printDocument()}>
+              Download PDF
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

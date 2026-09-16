@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { PayrollStatusBadge } from "@/components/shared/StatusBadge";
-import { formatMonthYear, formatPkr } from "@/lib/utils";
+import { displayUserName, formatMonthYear, formatPkr } from "@/lib/utils";
 import type { PayrollSlip } from "@/types";
 
 export function PayslipSheet({
@@ -36,8 +36,8 @@ export function PayslipSheet({
 
       <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
         <div>
-          <dt className="text-muted-foreground">Staff</dt>
-          <dd className="font-medium">{slip.user?.email ?? slip.userId}</dd>
+          <dt className="text-muted-foreground">Name</dt>
+          <dd className="font-medium">{displayUserName(slip.user)}</dd>
         </div>
         <div>
           <dt className="text-muted-foreground">Role</dt>

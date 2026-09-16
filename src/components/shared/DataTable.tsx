@@ -24,11 +24,13 @@ export function DataTable<T>({
   data,
   rowKey,
   empty,
+  tableClassName,
 }: {
   columns: DataTableColumn<T>[];
   data: T[];
   rowKey: (row: T) => string;
   empty?: ReactNode;
+  tableClassName?: string;
 }) {
   const reduce = useReducedMotion();
 
@@ -42,7 +44,7 @@ export function DataTable<T>({
 
   return (
     <div className="overflow-hidden rounded-[10px] border border-cloud bg-card">
-      <Table>
+      <Table className={tableClassName}>
         <TableHeader>
           <TableRow className="bg-muted/40 hover:bg-muted/40">
             {columns.map((column) => (
