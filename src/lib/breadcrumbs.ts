@@ -15,6 +15,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   payroll: "Payroll",
   expenses: "Expenses",
   admissions: "Admissions",
+  website: "Website",
   profile: "My profile",
   settings: "Settings",
   account: "Account",

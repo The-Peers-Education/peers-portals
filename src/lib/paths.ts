@@ -34,6 +34,7 @@ export const STAFF_APP_PREFIXES = [
   "/payroll",
   "/expenses",
   "/admissions",
+  "/website",
   "/profile",
   "/settings",
   "/library",

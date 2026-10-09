@@ -766,6 +766,38 @@ export interface LibraryBook {
   createdAt?: string;
 }
 
+export type GalleryCategoryName = "RESULTS" | "CAMPUS" | "EVENTS" | "SPORTS" | "ACADEMICS";
+
+export type HomepageAlbum = "RESULTS" | "CAMPUS";
+
+export interface CmsGalleryPhoto {
+  id: string;
+  alt: string;
+  category: GalleryCategoryName;
+  categoryLabel: string;
+  sortOrder: number;
+  createdAt: string;
+  imagePath: string;
+}
+
+export interface CmsNewsArticle {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string;
+  body: string;
+  category: string;
+  date: string;
+  publishedOn: string;
+  published: boolean;
+  createdAt: string;
+  imagePath: string;
+}
+
+export interface CmsSettings {
+  homepageAlbum: HomepageAlbum;
+}
+
 export interface BookLoan {
   id: string;
   bookId: string;

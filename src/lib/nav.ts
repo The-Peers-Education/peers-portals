@@ -4,6 +4,7 @@ import {
   CalendarRange,
   ClipboardList,
   GraduationCap,
+  Images,
   LayoutGrid,
   Receipt,
   UserCog,
@@ -89,6 +90,12 @@ export const NAV_ITEMS: NavItem[] = [
     label: "Admissions",
     icon: ClipboardList,
     roles: ROUTE_ROLES["/admissions"],
+  },
+  {
+    path: "/website",
+    label: "Website",
+    icon: Images,
+    roles: ROUTE_ROLES["/website"],
   },
   {
     path: "/profile",

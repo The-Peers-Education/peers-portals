@@ -58,6 +58,11 @@ import type {
   DashboardAnalytics,
   BookLoan,
   BookLoanStatus,
+  CmsGalleryPhoto,
+  CmsNewsArticle,
+  CmsSettings,
+  GalleryCategoryName,
+  HomepageAlbum,
   LibraryBook,
 } from "@/types";
 import { useAuthStore } from "@/lib/store";
@@ -72,6 +77,11 @@ function resolveApiBaseUrl() {
     .trim()
     .replace(/\/+$/, "");
   return raw.endsWith("/api/v1") ? raw : `${raw}/api/v1`;
+}
+
+export function apiAssetUrl(filePath: string) {
+  const origin = resolveApiBaseUrl().replace(/\/api\/v1$/, "");
+  return `${origin}${filePath}`;
 }
 
 export const api = axios.create({
@@ -316,6 +326,43 @@ export const admissionsApi = {
 
 export const dashboardApi = {
   analytics: () => api.get<ApiResponse<DashboardAnalytics>>("/dashboard/analytics").then(unwrap),
+};
+
+export const cmsApi = {
+  gallery: () => api.get<ApiResponse<CmsGalleryPhoto[]>>("/cms/gallery").then(unwrap),
+  addPhoto: (payload: { alt: string; category: GalleryCategoryName; dataBase64: string }) =>
+    api.post<ApiResponse<CmsGalleryPhoto>>("/cms/gallery", payload, { timeout: 60000 }).then(unwrap),
+  movePhoto: (id: string, direction: "up" | "down") =>
+    api.patch<ApiResponse<CmsGalleryPhoto[]>>(`/cms/gallery/${id}/move`, { direction }).then(unwrap),
+  removePhoto: (id: string) =>
+    api.delete<ApiResponse<{ deleted: boolean }>>(`/cms/gallery/${id}`).then(unwrap),
+  settings: () => api.get<ApiResponse<CmsSettings>>("/cms/settings").then(unwrap),
+  saveSettings: (homepageAlbum: HomepageAlbum) =>
+    api.put<ApiResponse<CmsSettings>>("/cms/settings", { homepageAlbum }).then(unwrap),
+  news: () => api.get<ApiResponse<CmsNewsArticle[]>>("/cms/news/manage").then(unwrap),
+  createNews: (payload: {
+    title: string;
+    excerpt: string;
+    body: string;
+    category: string;
+    publishedOn: string;
+    published: boolean;
+    dataBase64: string;
+  }) => api.post<ApiResponse<CmsNewsArticle>>("/cms/news", payload, { timeout: 60000 }).then(unwrap),
+  updateNews: (
+    id: string,
+    payload: {
+      title: string;
+      excerpt: string;
+      body: string;
+      category: string;
+      publishedOn: string;
+      published: boolean;
+      dataBase64?: string;
+    },
+  ) => api.patch<ApiResponse<CmsNewsArticle>>(`/cms/news/${id}`, payload, { timeout: 60000 }).then(unwrap),
+  removeNews: (id: string) =>
+    api.delete<ApiResponse<{ deleted: boolean }>>(`/cms/news/${id}`).then(unwrap),
 };
 
 export const libraryApi = {

@@ -32,6 +32,7 @@ export const ROUTE_ROLES: Record<string, Role[]> = {
   "/payroll": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/expenses": ["SUPER_ADMIN", "BRANCH_ADMIN", "ACCOUNTANT"],
   "/admissions": ["SUPER_ADMIN", "BRANCH_ADMIN"],
+  "/website": ["SUPER_ADMIN", "BRANCH_ADMIN"],
   "/profile": STAFF_ROLES,
   "/settings": STAFF_ROLES,
 };
